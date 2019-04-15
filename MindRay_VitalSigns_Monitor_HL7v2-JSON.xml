@@ -1,0 +1,383 @@
+<channel version="3.4.2">
+  <id>a1420ed5-bebe-4104-a02d-4cfe86de8970</id>
+  <nextMetaDataId>2</nextMetaDataId>
+  <name>MindRay_VitalSigns_Monitor_HL7v2-JSON</name>
+  <description>*******************************************************************
+	Author :   Vibinchander.v
+    Date-Created :   04-04-2019
+********************************************************************
+</description>
+  <enabled>true</enabled>
+  <lastModified>
+    <time>1554400413137</time>
+    <timezone>Asia/Calcutta</timezone>
+  </lastModified>
+  <revision>20</revision>
+  <sourceConnector version="3.4.2">
+    <metaDataId>0</metaDataId>
+    <name>sourceConnector</name>
+    <properties class="com.mirth.connect.connectors.vm.VmReceiverProperties" version="3.4.2">
+      <pluginProperties/>
+      <sourceConnectorProperties version="3.4.2">
+        <responseVariable>None</responseVariable>
+        <respondAfterProcessing>true</respondAfterProcessing>
+        <processBatch>false</processBatch>
+        <firstResponse>false</firstResponse>
+        <processingThreads>1</processingThreads>
+        <resourceIds class="linked-hash-map">
+          <entry>
+            <string>Default Resource</string>
+            <string>[Default Resource]</string>
+          </entry>
+        </resourceIds>
+        <queueBufferSize>1000</queueBufferSize>
+      </sourceConnectorProperties>
+    </properties>
+    <transformer version="3.4.2">
+      <steps>
+        <step>
+          <sequenceNumber>0</sequenceNumber>
+          <name>MSH &amp; EVN Mapping</name>
+          <script>var vitalSignsData 			   = {};
+vitalSignsData.messageHeaderData = {};
+
+var messageHeader 			= vitalSignsData.messageHeaderData;
+messageHeader.messageType 	= msg[&apos;MSH&apos;][&apos;MSH.9&apos;][&apos;MSH.9.1&apos;];
+messageHeader.eventType 		= msg[&apos;MSH&apos;][&apos;MSH.9&apos;][&apos;MSH.9.2&apos;];
+messageHeader.controlId 		= msg[&apos;MSH&apos;][&apos;MSH.10&apos;][&apos;MSH.10.1&apos;];
+messageHeader.environment 	= msg[&apos;MSH&apos;][&apos;MSH.11&apos;][&apos;MSH.11.1&apos;];
+messageHeader.versionId 		= msg[&apos;MSH&apos;][&apos;MSH.12&apos;][&apos;MSH.12.1&apos;];
+
+
+vitalSignsData.eventHeaderData 			= {};
+vitalSignsData.eventHeaderData.eventNumber   = msg[&apos;EVN&apos;][&apos;EVN.2&apos;][&apos;EVN.2.1&apos;];</script>
+          <type>JavaScript</type>
+          <data>
+            <entry>
+              <string>Script</string>
+              <string>var vitalSignsData 			   = {};
+vitalSignsData.messageHeaderData = {};
+
+var messageHeader 			= vitalSignsData.messageHeaderData;
+messageHeader.messageType 	= msg[&apos;MSH&apos;][&apos;MSH.9&apos;][&apos;MSH.9.1&apos;];
+messageHeader.eventType 		= msg[&apos;MSH&apos;][&apos;MSH.9&apos;][&apos;MSH.9.2&apos;];
+messageHeader.controlId 		= msg[&apos;MSH&apos;][&apos;MSH.10&apos;][&apos;MSH.10.1&apos;];
+messageHeader.environment 	= msg[&apos;MSH&apos;][&apos;MSH.11&apos;][&apos;MSH.11.1&apos;];
+messageHeader.versionId 		= msg[&apos;MSH&apos;][&apos;MSH.12&apos;][&apos;MSH.12.1&apos;];
+
+
+vitalSignsData.eventHeaderData 			= {};
+vitalSignsData.eventHeaderData.eventNumber   = msg[&apos;EVN&apos;][&apos;EVN.2&apos;][&apos;EVN.2.1&apos;];</string>
+            </entry>
+          </data>
+        </step>
+        <step>
+          <sequenceNumber>1</sequenceNumber>
+          <name>PID Mapping</name>
+          <script>vitalSignsData.patientHeaderData 	= {};
+var patientData 				= vitalSignsData.patientHeaderData;
+
+
+patientData.patientId 			= msg[&apos;PID&apos;][&apos;PID.3&apos;][&apos;PID.3.1&apos;];
+patientData.patientFamilyName 	= msg[&apos;PID&apos;][&apos;PID.5&apos;][&apos;PID.5.1&apos;];
+patientData.patientGivenName 		= msg[&apos;PID&apos;][&apos;PID.5&apos;][&apos;PID.5.2&apos;];</script>
+          <type>JavaScript</type>
+          <data>
+            <entry>
+              <string>Script</string>
+              <string>vitalSignsData.patientHeaderData 	= {};
+var patientData 				= vitalSignsData.patientHeaderData;
+
+
+patientData.patientId 			= msg[&apos;PID&apos;][&apos;PID.3&apos;][&apos;PID.3.1&apos;];
+patientData.patientFamilyName 	= msg[&apos;PID&apos;][&apos;PID.5&apos;][&apos;PID.5.1&apos;];
+patientData.patientGivenName 		= msg[&apos;PID&apos;][&apos;PID.5&apos;][&apos;PID.5.2&apos;];</string>
+            </entry>
+          </data>
+        </step>
+        <step>
+          <sequenceNumber>2</sequenceNumber>
+          <name>PV1 Mapping</name>
+          <script>vitalSignsData.encounterHeaderData 	= {};
+var enocunterData 					= vitalSignsData.encounterHeaderData;
+
+enocunterData.patientClass 	= msg[&apos;PV1&apos;][&apos;PV1.2&apos;][&apos;PV1.2.1&apos;];
+enocunterData.brandName 		= msg[&apos;PV1&apos;][&apos;PV1.3&apos;][&apos;PV1.3.1&apos;][&apos;PV1.3.1.1&apos;];
+enocunterData.brandNumber 	= msg[&apos;PV1&apos;][&apos;PV1.3&apos;][&apos;PV1.3.1&apos;][&apos;PV1.3.3.2&apos;];
+enocunterData.brandId 		= msg[&apos;PV1&apos;][&apos;PV1.3&apos;][&apos;PV1.3.1&apos;][&apos;PV1.3.3.4&apos;];
+enocunterData.brandnewNumber 	= msg[&apos;PV1&apos;][&apos;PV1.3&apos;][&apos;PV1.3.1&apos;][&apos;PV1.3.3.6&apos;];
+enocunterData.patientType 	= msg[&apos;PV1&apos;][&apos;PV1.18&apos;][&apos;PV1.18.1&apos;];</script>
+          <type>JavaScript</type>
+          <data>
+            <entry>
+              <string>Script</string>
+              <string>vitalSignsData.encounterHeaderData 	= {};
+var enocunterData 					= vitalSignsData.encounterHeaderData;
+
+enocunterData.patientClass 	= msg[&apos;PV1&apos;][&apos;PV1.2&apos;][&apos;PV1.2.1&apos;];
+enocunterData.brandName 		= msg[&apos;PV1&apos;][&apos;PV1.3&apos;][&apos;PV1.3.1&apos;][&apos;PV1.3.1.1&apos;];
+enocunterData.brandNumber 	= msg[&apos;PV1&apos;][&apos;PV1.3&apos;][&apos;PV1.3.1&apos;][&apos;PV1.3.3.2&apos;];
+enocunterData.brandId 		= msg[&apos;PV1&apos;][&apos;PV1.3&apos;][&apos;PV1.3.1&apos;][&apos;PV1.3.3.4&apos;];
+enocunterData.brandnewNumber 	= msg[&apos;PV1&apos;][&apos;PV1.3&apos;][&apos;PV1.3.1&apos;][&apos;PV1.3.3.6&apos;];
+enocunterData.patientType 	= msg[&apos;PV1&apos;][&apos;PV1.18&apos;][&apos;PV1.18.1&apos;];</string>
+            </entry>
+          </data>
+        </step>
+        <step>
+          <sequenceNumber>3</sequenceNumber>
+          <name>OBX Mapping</name>
+          <script>var obxLength = msg[&apos;OBX&apos;].length();
+
+vitalSignsData.VitalResults = [];
+
+for(i=0;i&lt;obxLength;i++){
+
+	var vitalObj = {};
+
+	if(msg[&apos;OBX&apos;][i][&apos;OBX.2&apos;][&apos;OBX.2.1&apos;]==&apos;ST&apos;){
+	vitalObj.valueType = &quot;String Data&quot;; 	
+	}
+	else if(msg[&apos;OBX&apos;][i][&apos;OBX.2&apos;][&apos;OBX.2.1&apos;]==&apos;CE&apos;){
+	vitalObj.valueType = &quot;Coded Entry&quot;;	
+	}
+	else if(msg[&apos;OBX&apos;][i][&apos;OBX.2&apos;][&apos;OBX.2.1&apos;]==&apos;NM&apos;){
+	vitalObj.valueType = &quot;Numeric&quot;;	
+	}
+
+	if(msg[&apos;OBX&apos;][i][&apos;OBX.3&apos;][&apos;OBX.3.2&apos;]!=&apos;&apos;){
+	vitalObj.observationIdentityName = msg[&apos;OBX&apos;][i][&apos;OBX.3&apos;][&apos;OBX.3.2&apos;];	
+	}
+	
+	vitalObj.observationIdentifier 	= msg[&apos;OBX&apos;][i][&apos;OBX.3&apos;][&apos;OBX.3.1&apos;];
+	vitalObj.observationValue 		= msg[&apos;OBX&apos;][i][&apos;OBX.5&apos;][&apos;OBX.5.1&apos;];
+	vitalObj.resultStatus 			= msg[&apos;OBX&apos;][i][&apos;OBX.11&apos;][&apos;OBX.11.1&apos;];
+
+	vitalSignsData.VitalResults.push(vitalObj);
+}</script>
+          <type>JavaScript</type>
+          <data>
+            <entry>
+              <string>Script</string>
+              <string>var obxLength = msg[&apos;OBX&apos;].length();
+
+vitalSignsData.VitalResults = [];
+
+for(i=0;i&lt;obxLength;i++){
+
+	var vitalObj = {};
+
+	if(msg[&apos;OBX&apos;][i][&apos;OBX.2&apos;][&apos;OBX.2.1&apos;]==&apos;ST&apos;){
+	vitalObj.valueType = &quot;String Data&quot;; 	
+	}
+	else if(msg[&apos;OBX&apos;][i][&apos;OBX.2&apos;][&apos;OBX.2.1&apos;]==&apos;CE&apos;){
+	vitalObj.valueType = &quot;Coded Entry&quot;;	
+	}
+	else if(msg[&apos;OBX&apos;][i][&apos;OBX.2&apos;][&apos;OBX.2.1&apos;]==&apos;NM&apos;){
+	vitalObj.valueType = &quot;Numeric&quot;;	
+	}
+
+	if(msg[&apos;OBX&apos;][i][&apos;OBX.3&apos;][&apos;OBX.3.2&apos;]!=&apos;&apos;){
+	vitalObj.observationIdentityName = msg[&apos;OBX&apos;][i][&apos;OBX.3&apos;][&apos;OBX.3.2&apos;];	
+	}
+	
+	vitalObj.observationIdentifier 	= msg[&apos;OBX&apos;][i][&apos;OBX.3&apos;][&apos;OBX.3.1&apos;];
+	vitalObj.observationValue 		= msg[&apos;OBX&apos;][i][&apos;OBX.5&apos;][&apos;OBX.5.1&apos;];
+	vitalObj.resultStatus 			= msg[&apos;OBX&apos;][i][&apos;OBX.11&apos;][&apos;OBX.11.1&apos;];
+
+	vitalSignsData.VitalResults.push(vitalObj);
+}</string>
+            </entry>
+          </data>
+        </step>
+        <step>
+          <sequenceNumber>4</sequenceNumber>
+          <name>Convert to JSON</name>
+          <script>var jsonData 	= JSON.stringify(vitalSignsData);
+msg 			= JsonUtil.prettyPrint(jsonData);</script>
+          <type>JavaScript</type>
+          <data>
+            <entry>
+              <string>Script</string>
+              <string>var jsonData 	= JSON.stringify(vitalSignsData);
+msg 			= JsonUtil.prettyPrint(jsonData);</string>
+            </entry>
+          </data>
+        </step>
+      </steps>
+      <inboundTemplate encoding="base64">TVNIfF5+XCZ8fHx8fHx8QURUXkEwMXwxMDF8UHwyLjMuMXwNRVZOfHwwMDAwMDAwMHwNUElEfHx8
+MDYxNDBmMDAtMjA1NS0wMzc3LTEwMDYxYzAwMDIwMGE3MDB8fE1PUkVOT15KT05BVEhBTnwNUFYx
+fHxJfF5eVEVMRU1FVFJJQSYxJiY0NjAxJiYxfHx8fHx8fHx8fHx8fHx8VXwNT0JYfHxTVHwyMzA0
+Xk1vbml0b3JOYW1lfHxNMDAwMXx8fHx8fEYNT0JYfHxDRXwyMzA1Xnx8MF58fHx8fHxGDU9CWHx8
+Q0V8MjMwNl58fDRefHx8fHx8Rg1PQlh8fENFfDQ1MjZefHwxXnx8fHx8fEYNT0JYfHxDRXwyMzA3
+Xnx8MF58fHx8fHxGDU9CWHx8Tk18MjIxMV58fDB8fHx8fHxGDU9CWHx8Tk18NDUyNF58fDB8fHx8
+fHxGDU9CWHx8U1R8MjMwOF5CZWROb1N0cnx8MDAwMXx8fHx8fEYNT0JYfHxTVHw0NTI3Xnx8MDAw
+MDAwMDAwMDAwMDAwMDAwMDAwMDAwfHx8fHx8Rg1PQlh8fENFfDQ1MjhefHwxNl58fHx8fHxGDU9C
+WHx8U1R8NDUyOV58fDAwNTAyMDAwMDA5OHx8fHx8fEYNT0JYfHxDRXw0NTMwXnx8MV58fHx8fHxG
+</inboundTemplate>
+      <outboundTemplate encoding="base64"></outboundTemplate>
+      <inboundDataType>HL7V2</inboundDataType>
+      <outboundDataType>JSON</outboundDataType>
+      <inboundProperties class="com.mirth.connect.plugins.datatypes.hl7v2.HL7v2DataTypeProperties" version="3.4.2">
+        <serializationProperties class="com.mirth.connect.plugins.datatypes.hl7v2.HL7v2SerializationProperties" version="3.4.2">
+          <handleRepetitions>true</handleRepetitions>
+          <handleSubcomponents>true</handleSubcomponents>
+          <useStrictParser>false</useStrictParser>
+          <useStrictValidation>false</useStrictValidation>
+          <stripNamespaces>true</stripNamespaces>
+          <segmentDelimiter>\r</segmentDelimiter>
+          <convertLineBreaks>true</convertLineBreaks>
+        </serializationProperties>
+        <deserializationProperties class="com.mirth.connect.plugins.datatypes.hl7v2.HL7v2DeserializationProperties" version="3.4.2">
+          <useStrictParser>false</useStrictParser>
+          <useStrictValidation>false</useStrictValidation>
+          <segmentDelimiter>\r</segmentDelimiter>
+        </deserializationProperties>
+        <batchProperties class="com.mirth.connect.plugins.datatypes.hl7v2.HL7v2BatchProperties" version="3.4.2">
+          <splitType>MSH_Segment</splitType>
+          <batchScript></batchScript>
+        </batchProperties>
+        <responseGenerationProperties class="com.mirth.connect.plugins.datatypes.hl7v2.HL7v2ResponseGenerationProperties" version="3.4.2">
+          <segmentDelimiter>\r</segmentDelimiter>
+          <successfulACKCode>AA</successfulACKCode>
+          <successfulACKMessage></successfulACKMessage>
+          <errorACKCode>AE</errorACKCode>
+          <errorACKMessage>An Error Occurred Processing Message.</errorACKMessage>
+          <rejectedACKCode>AR</rejectedACKCode>
+          <rejectedACKMessage>Message Rejected.</rejectedACKMessage>
+          <msh15ACKAccept>false</msh15ACKAccept>
+          <dateFormat>yyyyMMddHHmmss.SSS</dateFormat>
+        </responseGenerationProperties>
+        <responseValidationProperties class="com.mirth.connect.plugins.datatypes.hl7v2.HL7v2ResponseValidationProperties" version="3.4.2">
+          <successfulACKCode>AA,CA</successfulACKCode>
+          <errorACKCode>AE,CE</errorACKCode>
+          <rejectedACKCode>AR,CR</rejectedACKCode>
+          <validateMessageControlId>true</validateMessageControlId>
+          <originalMessageControlId>Destination_Encoded</originalMessageControlId>
+          <originalIdMapVariable></originalIdMapVariable>
+        </responseValidationProperties>
+      </inboundProperties>
+      <outboundProperties class="com.mirth.connect.plugins.datatypes.json.JSONDataTypeProperties" version="3.4.2">
+        <batchProperties class="com.mirth.connect.plugins.datatypes.json.JSONBatchProperties" version="3.4.2">
+          <splitType>JavaScript</splitType>
+          <batchScript></batchScript>
+        </batchProperties>
+      </outboundProperties>
+    </transformer>
+    <filter version="3.4.2">
+      <rules/>
+    </filter>
+    <transportName>Channel Reader</transportName>
+    <mode>SOURCE</mode>
+    <enabled>true</enabled>
+    <waitForPrevious>true</waitForPrevious>
+  </sourceConnector>
+  <destinationConnectors>
+    <connector version="3.4.2">
+      <metaDataId>1</metaDataId>
+      <name>Destination 1</name>
+      <properties class="com.mirth.connect.connectors.vm.VmDispatcherProperties" version="3.4.2">
+        <pluginProperties/>
+        <destinationConnectorProperties version="3.4.2">
+          <queueEnabled>false</queueEnabled>
+          <sendFirst>false</sendFirst>
+          <retryIntervalMillis>10000</retryIntervalMillis>
+          <regenerateTemplate>false</regenerateTemplate>
+          <retryCount>0</retryCount>
+          <rotate>false</rotate>
+          <includeFilterTransformer>false</includeFilterTransformer>
+          <threadCount>1</threadCount>
+          <threadAssignmentVariable></threadAssignmentVariable>
+          <validateResponse>false</validateResponse>
+          <resourceIds class="linked-hash-map">
+            <entry>
+              <string>Default Resource</string>
+              <string>[Default Resource]</string>
+            </entry>
+          </resourceIds>
+          <queueBufferSize>1000</queueBufferSize>
+        </destinationConnectorProperties>
+        <channelId>none</channelId>
+        <channelTemplate>${message.encodedData}</channelTemplate>
+        <mapVariables/>
+      </properties>
+      <transformer version="3.4.2">
+        <steps/>
+        <inboundDataType>JSON</inboundDataType>
+        <outboundDataType>JSON</outboundDataType>
+        <inboundProperties class="com.mirth.connect.plugins.datatypes.json.JSONDataTypeProperties" version="3.4.2">
+          <batchProperties class="com.mirth.connect.plugins.datatypes.json.JSONBatchProperties" version="3.4.2">
+            <splitType>JavaScript</splitType>
+            <batchScript></batchScript>
+          </batchProperties>
+        </inboundProperties>
+        <outboundProperties class="com.mirth.connect.plugins.datatypes.json.JSONDataTypeProperties" version="3.4.2">
+          <batchProperties class="com.mirth.connect.plugins.datatypes.json.JSONBatchProperties" version="3.4.2">
+            <splitType>JavaScript</splitType>
+            <batchScript></batchScript>
+          </batchProperties>
+        </outboundProperties>
+      </transformer>
+      <responseTransformer version="3.4.2">
+        <steps/>
+        <inboundDataType>JSON</inboundDataType>
+        <outboundDataType>JSON</outboundDataType>
+        <inboundProperties class="com.mirth.connect.plugins.datatypes.json.JSONDataTypeProperties" version="3.4.2">
+          <batchProperties class="com.mirth.connect.plugins.datatypes.json.JSONBatchProperties" version="3.4.2">
+            <splitType>JavaScript</splitType>
+            <batchScript></batchScript>
+          </batchProperties>
+        </inboundProperties>
+        <outboundProperties class="com.mirth.connect.plugins.datatypes.json.JSONDataTypeProperties" version="3.4.2">
+          <batchProperties class="com.mirth.connect.plugins.datatypes.json.JSONBatchProperties" version="3.4.2">
+            <splitType>JavaScript</splitType>
+            <batchScript></batchScript>
+          </batchProperties>
+        </outboundProperties>
+      </responseTransformer>
+      <filter version="3.4.2">
+        <rules/>
+      </filter>
+      <transportName>Channel Writer</transportName>
+      <mode>DESTINATION</mode>
+      <enabled>true</enabled>
+      <waitForPrevious>true</waitForPrevious>
+    </connector>
+  </destinationConnectors>
+  <preprocessingScript>// Modify the message variable below to pre process data
+return message;</preprocessingScript>
+  <postprocessingScript>// This script executes once after a message has been processed
+// Responses returned from here will be stored as &quot;Postprocessor&quot; in the response map
+return;</postprocessingScript>
+  <deployScript>// This script executes once when the channel is deployed
+// You only have access to the globalMap and globalChannelMap here to persist data
+return;</deployScript>
+  <undeployScript>// This script executes once when the channel is undeployed
+// You only have access to the globalMap and globalChannelMap here to persist data
+return;</undeployScript>
+  <properties version="3.4.2">
+    <clearGlobalChannelMap>true</clearGlobalChannelMap>
+    <messageStorageMode>PRODUCTION</messageStorageMode>
+    <encryptData>false</encryptData>
+    <removeContentOnCompletion>false</removeContentOnCompletion>
+    <removeOnlyFilteredOnCompletion>false</removeOnlyFilteredOnCompletion>
+    <removeAttachmentsOnCompletion>false</removeAttachmentsOnCompletion>
+    <initialState>STARTED</initialState>
+    <storeAttachments>false</storeAttachments>
+    <tags class="linked-hash-set">
+      <string>PiMedica_VitalSigns_Lab</string>
+    </tags>
+    <metaDataColumns/>
+    <attachmentProperties version="3.4.2">
+      <type>None</type>
+      <properties/>
+    </attachmentProperties>
+    <archiveEnabled>true</archiveEnabled>
+    <resourceIds class="linked-hash-map">
+      <entry>
+        <string>Default Resource</string>
+        <string>[Default Resource]</string>
+      </entry>
+    </resourceIds>
+  </properties>
+  <codeTemplateLibraries/>
+</channel>
