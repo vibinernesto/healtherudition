@@ -1,0 +1,626 @@
+<channel version="3.4.0">
+  <id>bfdb7bbe-b2b0-41e5-800e-7f6533e9075d</id>
+  <nextMetaDataId>2</nextMetaDataId>
+  <name>INT_INBOUND_LIMA_DR-WEYER_PRIORS_INGEST</name>
+  <description>Change History :
+
+02-08-2018 -  VC - Created channel</description>
+  <enabled>true</enabled>
+  <lastModified>
+    <time>1533798251523</time>
+    <timezone>Asia/Calcutta</timezone>
+  </lastModified>
+  <revision>18</revision>
+  <sourceConnector version="3.4.0">
+    <metaDataId>0</metaDataId>
+    <name>sourceConnector</name>
+    <properties class="com.mirth.connect.connectors.vm.VmReceiverProperties" version="3.4.0">
+      <pluginProperties/>
+      <sourceConnectorProperties version="3.4.0">
+        <responseVariable>None</responseVariable>
+        <respondAfterProcessing>true</respondAfterProcessing>
+        <processBatch>true</processBatch>
+        <firstResponse>false</firstResponse>
+        <processingThreads>1</processingThreads>
+        <resourceIds class="linked-hash-map">
+          <entry>
+            <string>Default Resource</string>
+            <string>[Default Resource]</string>
+          </entry>
+        </resourceIds>
+        <queueBufferSize>1000</queueBufferSize>
+      </sourceConnectorProperties>
+    </properties>
+    <transformer version="3.4.0">
+      <steps>
+        <step>
+          <sequenceNumber>0</sequenceNumber>
+          <name>Parse Dr.Weyer reports to the XML </name>
+          <script>// Patient Name 
+tmp[&apos;patient&apos;][&apos;patientName&apos;][&apos;namePart&apos;].(@partType == &quot;FAMILY&quot;)[&apos;@value&apos;] = msg[&apos;row&apos;][&apos;column2&apos;].toString();
+
+if (msg[&apos;row&apos;][&apos;column3&apos;].toString().indexOf(&apos; &apos;) != -1) {
+    var splitNames = msg[&apos;row&apos;][&apos;column3&apos;].toString().split(&apos; &apos;);
+    tmp[&apos;patient&apos;][&apos;patientName&apos;][&apos;namePart&apos;].(@partType == &quot;GIVEN&quot;)[&apos;@value&apos;] = splitNames[0];
+} else {
+    tmp[&apos;patient&apos;][&apos;patientName&apos;][&apos;namePart&apos;].(@partType == &quot;GIVEN&quot;)[&apos;@value&apos;] = msg[&apos;row&apos;][&apos;column3&apos;].toString();
+}
+
+if (msg[&apos;row&apos;][&apos;column3&apos;].toString().indexOf(&apos; &apos;) != -1) {
+    var splitNames = msg[&apos;row&apos;][&apos;column3&apos;].toString().split(&apos; &apos;);
+    tmp[&apos;patient&apos;][&apos;patientName&apos;][&apos;namePart&apos;].(@partType == &quot;MIDDLE&quot;)[&apos;@value&apos;] = splitNames[1];
+} else {
+    tmp[&apos;patient&apos;][&apos;patientName&apos;][&apos;namePart&apos;].(@partType == &quot;MIDDLE&quot;)[&apos;@value&apos;] = &apos;&apos;;
+}
+
+tmp[&apos;patient&apos;][&apos;patientName&apos;][&apos;namePart&apos;].(@partType == &quot;SUFFIX&quot;)[&apos;@value&apos;] = &apos;&apos;;
+tmp[&apos;patient&apos;][&apos;patientName&apos;][&apos;namePart&apos;].(@partType == &quot;PREFIX&quot;)[&apos;@value&apos;] = &apos;&apos;;
+
+// patient id - MRN
+tmp[&apos;patient&apos;][&apos;@idExtension&apos;] = msg[&apos;row&apos;][&apos;column5&apos;].toString();
+
+// Alternate Patient ID is same as Account Number
+tmp[&apos;patient&apos;][&apos;AltPatientID&apos;][&apos;@idExtension&apos;] = msg[&apos;row&apos;][&apos;column4&apos;].toString();
+
+// Encounter ID mapping to alternate patient id as Account Number
+tmp[&apos;patient&apos;][&apos;encounter&apos;][&apos;@idExtension&apos;] = msg[&apos;row&apos;][&apos;column4&apos;].toString();
+
+// Accession Number
+var splitBigSegment = channelMap.get(&apos;get_original_message&apos;).split(&apos;\n&apos;);
+
+var access_number_id_1 = splitBigSegment[3].toString().replace(&apos;#&apos;, &apos;&apos;);
+var access_number_id_2 = splitBigSegment[4].toString().replace(&apos;#&apos;, &apos;&apos;);
+var access_number_id_3 = splitBigSegment[5].toString();
+var new_accession_id = &apos;&apos;;
+
+if((access_number_id_3!=&apos;&apos;)&amp;&amp;(access_number_id_3.indexOf(&apos;#&apos;)!=-1)){
+	 tmp[&apos;patient&apos;][&apos;order&apos;][&apos;accessionNumber&apos;][&apos;@idExtension&apos;] = access_number_id_3.replace(&apos;#&apos;,&apos;&apos;);
+	 new_accession_id = access_number_id_3;
+}
+
+if(new_accession_id==&apos;&apos;){
+	if(access_number_id_1.toString() != &apos;&apos;){
+		if(access_number_id_1.indexOf(&apos;PID&apos;)==-1){
+    			if (access_number_id_1.indexOf(&apos;/&apos;) == -1) {
+        			if (access_number_id_1.match(/^[0-9]+$/) != null) {
+            				tmp[&apos;patient&apos;][&apos;order&apos;][&apos;accessionNumber&apos;][&apos;@idExtension&apos;] = access_number_id_1;
+        					} else {
+        						if(access_number_id_1.indexOf(&apos;*&apos;)!=-1){
+								tmp[&apos;patient&apos;][&apos;order&apos;][&apos;accessionNumber&apos;][&apos;@idExtension&apos;] = access_number_id_2;
+								}else{
+            						tmp[&apos;patient&apos;][&apos;order&apos;][&apos;accessionNumber&apos;][&apos;@idExtension&apos;] = &apos;N/A&apos;;
+								}
+        						 }
+    						}else {
+        						var get_one_acc_num = access_number_id_1.split(&apos;/&apos;);
+        						tmp[&apos;patient&apos;][&apos;order&apos;][&apos;accessionNumber&apos;][&apos;@idExtension&apos;] = get_one_acc_num[0].trim();
+    						}
+				}else{
+					tmp[&apos;patient&apos;][&apos;order&apos;][&apos;accessionNumber&apos;][&apos;@idExtension&apos;] = access_number_id_2.replace(&apos;#&apos;,&apos;&apos;);
+			}
+	}else{
+    		tmp[&apos;patient&apos;][&apos;order&apos;][&apos;accessionNumber&apos;][&apos;@idExtension&apos;] = access_number_id_2;
+	}
+}
+
+// patient date of birth - DOB
+var dob = msg[&apos;row&apos;][&apos;column11&apos;].toString();
+tmp[&apos;patient&apos;][&apos;dateOfBirth&apos;][&apos;@value&apos;] = dob.substring(0, 4) + &apos;-&apos; + dob.substring(4, 6) + &apos;-&apos; + dob.substring(6, 8);
+
+// Sending Facility Mnemonic
+tmp[&apos;sourceMessage&apos;][&apos;sendingFacility&apos;][&apos;@value&apos;] = msg[&apos;row&apos;][&apos;column13&apos;].toString();
+
+// Sending Facility connect application ID
+tmp[&apos;patient&apos;][&apos;encounter&apos;][&apos;patientLocation&apos;][&apos;facility&apos;][&apos;@idExtension&apos;] = &apos;645&apos;;
+
+// Radiologist / Technician Name
+var technologistName = msg[&apos;row&apos;][&apos;column8&apos;].toString() + &apos; &apos; + msg[&apos;row&apos;][&apos;column9&apos;].toString();
+var technologistNameSplit = technologistName.split(&apos; &apos;);
+tmp[&apos;patient&apos;][&apos;order&apos;][&apos;technologist&apos;][&apos;name&apos;][&apos;namePart&apos;].(@partType == &quot;FAMILY&quot;)[&apos;@value&apos;] = technologistNameSplit[0];
+tmp[&apos;patient&apos;][&apos;order&apos;][&apos;technologist&apos;][&apos;name&apos;][&apos;namePart&apos;].(@partType == &quot;GIVEN&quot;)[&apos;@value&apos;] = technologistNameSplit[2];
+tmp[&apos;patient&apos;][&apos;order&apos;][&apos;technologist&apos;][&apos;name&apos;][&apos;namePart&apos;].(@partType == &quot;MIDDLE&quot;)[&apos;@value&apos;] = technologistNameSplit[3];
+tmp[&apos;patient&apos;][&apos;order&apos;][&apos;technologist&apos;][&apos;name&apos;][&apos;namePart&apos;].(@partType == &quot;SUFFIX&quot;)[&apos;@value&apos;] = technologistNameSplit[1];
+tmp[&apos;patient&apos;][&apos;order&apos;][&apos;technologist&apos;][&apos;name&apos;][&apos;namePart&apos;].(@partType == &quot;PREFIX&quot;)[&apos;@value&apos;] = &apos;&apos;
+
+// Ordering Provider / Referring Physician
+var splitOrderingProvider = msg[&apos;row&apos;][&apos;column15&apos;].toString().split(&apos;\n&apos;);
+var orderingProviderName = splitOrderingProvider[0].toString().split(&apos; &apos;);
+tmp[&apos;patient&apos;][&apos;order&apos;][&apos;orderingProvider&apos;][&apos;providerName&apos;][&apos;namePart&apos;].(@partType == &quot;FAMILY&quot;)[&apos;@value&apos;] = orderingProviderName[0];
+tmp[&apos;patient&apos;][&apos;order&apos;][&apos;orderingProvider&apos;][&apos;providerName&apos;][&apos;namePart&apos;].(@partType == &quot;GIVEN&quot;)[&apos;@value&apos;] = orderingProviderName[1];
+tmp[&apos;patient&apos;][&apos;order&apos;][&apos;orderingProvider&apos;][&apos;providerName&apos;][&apos;namePart&apos;].(@partType == &quot;MIDDLE&quot;)[&apos;@value&apos;] = &apos;&apos;;
+tmp[&apos;patient&apos;][&apos;order&apos;][&apos;orderingProvider&apos;][&apos;providerName&apos;][&apos;namePart&apos;].(@partType == &quot;SUFFIX&quot;)[&apos;@value&apos;] = orderingProviderName[2];
+tmp[&apos;patient&apos;][&apos;order&apos;][&apos;orderingProvider&apos;][&apos;providerName&apos;][&apos;namePart&apos;].(@partType == &quot;PREFIX&quot;)[&apos;@value&apos;] = orderingProviderName[3];
+
+// Date of service is taken as Date of Exam
+var dateOfService = msg[&apos;row&apos;][&apos;column14&apos;].toString().split(&apos;/&apos;);
+
+if (dateOfService[2].length == 2) {
+    tmp[&apos;patient&apos;][&apos;order&apos;][&apos;studyTime-Start&apos;][&apos;@value&apos;] = &apos;20&apos; + dateOfService[2] + dateOfService[0] + dateOfService[1];
+} else {
+    tmp[&apos;patient&apos;][&apos;order&apos;][&apos;studyTime-Start&apos;][&apos;@value&apos;] = dateOfService[2] + dateOfService[0] + dateOfService[1];
+}
+
+// Modality is it same as  Exam Category
+if (msg[&apos;row&apos;][&apos;column6&apos;].toString() == &apos;MAM&apos;) {
+    tmp[&apos;patient&apos;][&apos;order&apos;][&apos;modality&apos;][&apos;@code&apos;] = &apos;MG&apos;;
+} else {
+    tmp[&apos;patient&apos;][&apos;order&apos;][&apos;modality&apos;][&apos;@code&apos;] = msg[&apos;row&apos;][&apos;column6&apos;].toString();
+}
+
+// Procedure code - does not exists in the priors
+tmp[&apos;patient&apos;][&apos;order&apos;][&apos;procedure&apos;][&apos;@code&apos;] = &apos;&apos;;
+
+// Procedure description
+if (splitBigSegment[5].toString() != &apos;&apos;) {
+    tmp[&apos;patient&apos;][&apos;order&apos;][&apos;procedure&apos;][&apos;@displayName&apos;] = splitBigSegment[5].toString();
+} else {
+    tmp[&apos;patient&apos;][&apos;order&apos;][&apos;procedure&apos;][&apos;@displayName&apos;] = splitBigSegment[6].toString();
+}
+
+var report_text_length = splitBigSegment.length;
+var general_string_builder = java.lang.StringBuilder();
+
+for (i = 0; i &lt; report_text_length; i++) {
+    general_string_builder.append(splitBigSegment[i]);
+    general_string_builder.append(&apos;\n&apos;);
+}
+
+var extracted_report_text = &apos;&apos;;
+
+if (general_string_builder.toString().indexOf(&apos;IMPRESSION:&apos;) != -1) {
+    var extracted_report_impression = general_string_builder.toString().split(&apos;IMPRESSION:&apos;);
+    tmp[&apos;patient&apos;][&apos;order&apos;][&apos;result&apos;][&apos;generalText&apos;] = extracted_report_impression[0].toString();
+    tmp[&apos;patient&apos;][&apos;order&apos;][&apos;result&apos;][&apos;impressionText&apos;] = &apos;IMPRESSION:&apos; + extracted_report_impression[1].toString();
+} else {
+    tmp[&apos;patient&apos;][&apos;order&apos;][&apos;result&apos;][&apos;generalText&apos;] = general_string_builder.toString();
+}</script>
+          <type>JavaScript</type>
+          <data>
+            <entry>
+              <string>Script</string>
+              <string>// Patient Name 
+tmp[&apos;patient&apos;][&apos;patientName&apos;][&apos;namePart&apos;].(@partType == &quot;FAMILY&quot;)[&apos;@value&apos;] = msg[&apos;row&apos;][&apos;column2&apos;].toString();
+
+if (msg[&apos;row&apos;][&apos;column3&apos;].toString().indexOf(&apos; &apos;) != -1) {
+    var splitNames = msg[&apos;row&apos;][&apos;column3&apos;].toString().split(&apos; &apos;);
+    tmp[&apos;patient&apos;][&apos;patientName&apos;][&apos;namePart&apos;].(@partType == &quot;GIVEN&quot;)[&apos;@value&apos;] = splitNames[0];
+} else {
+    tmp[&apos;patient&apos;][&apos;patientName&apos;][&apos;namePart&apos;].(@partType == &quot;GIVEN&quot;)[&apos;@value&apos;] = msg[&apos;row&apos;][&apos;column3&apos;].toString();
+}
+
+if (msg[&apos;row&apos;][&apos;column3&apos;].toString().indexOf(&apos; &apos;) != -1) {
+    var splitNames = msg[&apos;row&apos;][&apos;column3&apos;].toString().split(&apos; &apos;);
+    tmp[&apos;patient&apos;][&apos;patientName&apos;][&apos;namePart&apos;].(@partType == &quot;MIDDLE&quot;)[&apos;@value&apos;] = splitNames[1];
+} else {
+    tmp[&apos;patient&apos;][&apos;patientName&apos;][&apos;namePart&apos;].(@partType == &quot;MIDDLE&quot;)[&apos;@value&apos;] = &apos;&apos;;
+}
+
+tmp[&apos;patient&apos;][&apos;patientName&apos;][&apos;namePart&apos;].(@partType == &quot;SUFFIX&quot;)[&apos;@value&apos;] = &apos;&apos;;
+tmp[&apos;patient&apos;][&apos;patientName&apos;][&apos;namePart&apos;].(@partType == &quot;PREFIX&quot;)[&apos;@value&apos;] = &apos;&apos;;
+
+// patient id - MRN
+tmp[&apos;patient&apos;][&apos;@idExtension&apos;] = msg[&apos;row&apos;][&apos;column5&apos;].toString();
+
+// Alternate Patient ID is same as Account Number
+tmp[&apos;patient&apos;][&apos;AltPatientID&apos;][&apos;@idExtension&apos;] = msg[&apos;row&apos;][&apos;column4&apos;].toString();
+
+// Encounter ID mapping to alternate patient id as Account Number
+tmp[&apos;patient&apos;][&apos;encounter&apos;][&apos;@idExtension&apos;] = msg[&apos;row&apos;][&apos;column4&apos;].toString();
+
+// Accession Number
+var splitBigSegment = channelMap.get(&apos;get_original_message&apos;).split(&apos;\n&apos;);
+
+var access_number_id_1 = splitBigSegment[3].toString().replace(&apos;#&apos;, &apos;&apos;);
+var access_number_id_2 = splitBigSegment[4].toString().replace(&apos;#&apos;, &apos;&apos;);
+var access_number_id_3 = splitBigSegment[5].toString();
+var new_accession_id = &apos;&apos;;
+
+if((access_number_id_3!=&apos;&apos;)&amp;&amp;(access_number_id_3.indexOf(&apos;#&apos;)!=-1)){
+	 tmp[&apos;patient&apos;][&apos;order&apos;][&apos;accessionNumber&apos;][&apos;@idExtension&apos;] = access_number_id_3.replace(&apos;#&apos;,&apos;&apos;);
+	 new_accession_id = access_number_id_3;
+}
+
+if(new_accession_id==&apos;&apos;){
+	if(access_number_id_1.toString() != &apos;&apos;){
+		if(access_number_id_1.indexOf(&apos;PID&apos;)==-1){
+    			if (access_number_id_1.indexOf(&apos;/&apos;) == -1) {
+        			if (access_number_id_1.match(/^[0-9]+$/) != null) {
+            				tmp[&apos;patient&apos;][&apos;order&apos;][&apos;accessionNumber&apos;][&apos;@idExtension&apos;] = access_number_id_1;
+        					} else {
+        						if(access_number_id_1.indexOf(&apos;*&apos;)!=-1){
+								tmp[&apos;patient&apos;][&apos;order&apos;][&apos;accessionNumber&apos;][&apos;@idExtension&apos;] = access_number_id_2;
+								}else{
+            						tmp[&apos;patient&apos;][&apos;order&apos;][&apos;accessionNumber&apos;][&apos;@idExtension&apos;] = &apos;N/A&apos;;
+								}
+        						 }
+    						}else {
+        						var get_one_acc_num = access_number_id_1.split(&apos;/&apos;);
+        						tmp[&apos;patient&apos;][&apos;order&apos;][&apos;accessionNumber&apos;][&apos;@idExtension&apos;] = get_one_acc_num[0].trim();
+    						}
+				}else{
+					tmp[&apos;patient&apos;][&apos;order&apos;][&apos;accessionNumber&apos;][&apos;@idExtension&apos;] = access_number_id_2.replace(&apos;#&apos;,&apos;&apos;);
+			}
+	}else{
+    		tmp[&apos;patient&apos;][&apos;order&apos;][&apos;accessionNumber&apos;][&apos;@idExtension&apos;] = access_number_id_2;
+	}
+}
+
+// patient date of birth - DOB
+var dob = msg[&apos;row&apos;][&apos;column11&apos;].toString();
+tmp[&apos;patient&apos;][&apos;dateOfBirth&apos;][&apos;@value&apos;] = dob.substring(0, 4) + &apos;-&apos; + dob.substring(4, 6) + &apos;-&apos; + dob.substring(6, 8);
+
+// Sending Facility Mnemonic
+tmp[&apos;sourceMessage&apos;][&apos;sendingFacility&apos;][&apos;@value&apos;] = msg[&apos;row&apos;][&apos;column13&apos;].toString();
+
+// Sending Facility connect application ID
+tmp[&apos;patient&apos;][&apos;encounter&apos;][&apos;patientLocation&apos;][&apos;facility&apos;][&apos;@idExtension&apos;] = &apos;645&apos;;
+
+// Radiologist / Technician Name
+var technologistName = msg[&apos;row&apos;][&apos;column8&apos;].toString() + &apos; &apos; + msg[&apos;row&apos;][&apos;column9&apos;].toString();
+var technologistNameSplit = technologistName.split(&apos; &apos;);
+tmp[&apos;patient&apos;][&apos;order&apos;][&apos;technologist&apos;][&apos;name&apos;][&apos;namePart&apos;].(@partType == &quot;FAMILY&quot;)[&apos;@value&apos;] = technologistNameSplit[0];
+tmp[&apos;patient&apos;][&apos;order&apos;][&apos;technologist&apos;][&apos;name&apos;][&apos;namePart&apos;].(@partType == &quot;GIVEN&quot;)[&apos;@value&apos;] = technologistNameSplit[2];
+tmp[&apos;patient&apos;][&apos;order&apos;][&apos;technologist&apos;][&apos;name&apos;][&apos;namePart&apos;].(@partType == &quot;MIDDLE&quot;)[&apos;@value&apos;] = technologistNameSplit[3];
+tmp[&apos;patient&apos;][&apos;order&apos;][&apos;technologist&apos;][&apos;name&apos;][&apos;namePart&apos;].(@partType == &quot;SUFFIX&quot;)[&apos;@value&apos;] = technologistNameSplit[1];
+tmp[&apos;patient&apos;][&apos;order&apos;][&apos;technologist&apos;][&apos;name&apos;][&apos;namePart&apos;].(@partType == &quot;PREFIX&quot;)[&apos;@value&apos;] = &apos;&apos;
+
+// Ordering Provider / Referring Physician
+var splitOrderingProvider = msg[&apos;row&apos;][&apos;column15&apos;].toString().split(&apos;\n&apos;);
+var orderingProviderName = splitOrderingProvider[0].toString().split(&apos; &apos;);
+tmp[&apos;patient&apos;][&apos;order&apos;][&apos;orderingProvider&apos;][&apos;providerName&apos;][&apos;namePart&apos;].(@partType == &quot;FAMILY&quot;)[&apos;@value&apos;] = orderingProviderName[0];
+tmp[&apos;patient&apos;][&apos;order&apos;][&apos;orderingProvider&apos;][&apos;providerName&apos;][&apos;namePart&apos;].(@partType == &quot;GIVEN&quot;)[&apos;@value&apos;] = orderingProviderName[1];
+tmp[&apos;patient&apos;][&apos;order&apos;][&apos;orderingProvider&apos;][&apos;providerName&apos;][&apos;namePart&apos;].(@partType == &quot;MIDDLE&quot;)[&apos;@value&apos;] = &apos;&apos;;
+tmp[&apos;patient&apos;][&apos;order&apos;][&apos;orderingProvider&apos;][&apos;providerName&apos;][&apos;namePart&apos;].(@partType == &quot;SUFFIX&quot;)[&apos;@value&apos;] = orderingProviderName[2];
+tmp[&apos;patient&apos;][&apos;order&apos;][&apos;orderingProvider&apos;][&apos;providerName&apos;][&apos;namePart&apos;].(@partType == &quot;PREFIX&quot;)[&apos;@value&apos;] = orderingProviderName[3];
+
+// Date of service is taken as Date of Exam
+var dateOfService = msg[&apos;row&apos;][&apos;column14&apos;].toString().split(&apos;/&apos;);
+
+if (dateOfService[2].length == 2) {
+    tmp[&apos;patient&apos;][&apos;order&apos;][&apos;studyTime-Start&apos;][&apos;@value&apos;] = &apos;20&apos; + dateOfService[2] + dateOfService[0] + dateOfService[1];
+} else {
+    tmp[&apos;patient&apos;][&apos;order&apos;][&apos;studyTime-Start&apos;][&apos;@value&apos;] = dateOfService[2] + dateOfService[0] + dateOfService[1];
+}
+
+// Modality is it same as  Exam Category
+if (msg[&apos;row&apos;][&apos;column6&apos;].toString() == &apos;MAM&apos;) {
+    tmp[&apos;patient&apos;][&apos;order&apos;][&apos;modality&apos;][&apos;@code&apos;] = &apos;MG&apos;;
+} else {
+    tmp[&apos;patient&apos;][&apos;order&apos;][&apos;modality&apos;][&apos;@code&apos;] = msg[&apos;row&apos;][&apos;column6&apos;].toString();
+}
+
+// Procedure code - does not exists in the priors
+tmp[&apos;patient&apos;][&apos;order&apos;][&apos;procedure&apos;][&apos;@code&apos;] = &apos;&apos;;
+
+// Procedure description
+if (splitBigSegment[5].toString() != &apos;&apos;) {
+    tmp[&apos;patient&apos;][&apos;order&apos;][&apos;procedure&apos;][&apos;@displayName&apos;] = splitBigSegment[5].toString();
+} else {
+    tmp[&apos;patient&apos;][&apos;order&apos;][&apos;procedure&apos;][&apos;@displayName&apos;] = splitBigSegment[6].toString();
+}
+
+var report_text_length = splitBigSegment.length;
+var general_string_builder = java.lang.StringBuilder();
+
+for (i = 0; i &lt; report_text_length; i++) {
+    general_string_builder.append(splitBigSegment[i]);
+    general_string_builder.append(&apos;\n&apos;);
+}
+
+var extracted_report_text = &apos;&apos;;
+
+if (general_string_builder.toString().indexOf(&apos;IMPRESSION:&apos;) != -1) {
+    var extracted_report_impression = general_string_builder.toString().split(&apos;IMPRESSION:&apos;);
+    tmp[&apos;patient&apos;][&apos;order&apos;][&apos;result&apos;][&apos;generalText&apos;] = extracted_report_impression[0].toString();
+    tmp[&apos;patient&apos;][&apos;order&apos;][&apos;result&apos;][&apos;impressionText&apos;] = &apos;IMPRESSION:&apos; + extracted_report_impression[1].toString();
+} else {
+    tmp[&apos;patient&apos;][&apos;order&apos;][&apos;result&apos;][&apos;generalText&apos;] = general_string_builder.toString();
+}</string>
+            </entry>
+          </data>
+        </step>
+      </steps>
+      <inboundTemplate encoding="base64"></inboundTemplate>
+      <outboundTemplate encoding="base64">PG1lc3NhZ2U+CiAgPHNvdXJjZU1lc3NhZ2UgaWRSb290PSIiIGlkRXh0ZW5zaW9uPSIiPiAgICAg
+IDwhLS0gQWRkIE1lc3NhZ2UgTWV0YWRhdGEtLT4KICAgIDx0cmFuc2FjdGlvbklEIGlkUm9vdD0i
+IiBpZEV4dGVuc2lvbj0iIi8+IDwhLS0gTWlydGggYXNzaWduZWQgLSBHVUlEIC0tPgogICAgPG1l
+c3NhZ2VJRCBpZFJvb3Q9IiIgaWRFeHRlbnNpb249IiIvPiAgIDwhLS0gSUQgZnJvbSBzb3VyY2Ug
+c3lzdGVtIC0tPgogICAgPHNlbmRpbmdGYWNpbGl0eSB2YWx1ZT0iIi8+ICAgICA8IS0tIHRyZWF0
+IGFzIElEPyAtLT4KICAgIDxzZW5kaW5nQXBwbGljYXRpb24gdmFsdWU9IiIvPiAgICAgIDwhLS0g
+dHJlYXQgYXMgSUQ/IC0tPgogICAgPHJlY2VpdmluZ0ZhY2lsaXR5IHZhbHVlPSIiLz4gICA8IS0t
+IHRyZWF0IGFzIElEPyAtLT4KICAgIDxyZWNlaXZpbmdBcHBsaWNhdGlvbiB2YWx1ZT0iIi8+ICAg
+ICAgPCEtLSB0cmVhdCBhcyBJRD8gLS0+CiAgICA8bWVzc2FnZVR5cGUgdmFsdWU9IiIvPgogICAg
+PHRyaWdnZXJFdmVudCB2YWx1ZT0iIi8+CiAgICA8bWVzc2FnZVZlcnNpb24gdmFsdWU9IiIvPgog
+ICAgPHByb2Nlc3NpbmdGbGFnIGNvZGU9IiIgY29kZVN5c3RlbT0iIiBkaXNwbGF5TmFtZT0iIi8+
+CiAgICA8bWVzc2FnZURhdGVUaW1lIHZhbHVlPSIiLz4KICA8L3NvdXJjZU1lc3NhZ2U+CiAgPHBh
+dGllbnQgaWRSb290PSIiIGlkRXh0ZW5zaW9uPSIiPgogICAgPHBhdGllbnROYW1lPgogICAgICA8
+bmFtZVBhcnQgdmFsdWU9IiIgcGFydFR5cGU9IkZBTUlMWSIvPiAgPCEtLSBtdWx0aXBsZSBuYW1l
+IHBhcnRzIC0tPgogICAgICA8bmFtZVBhcnQgdmFsdWU9IiIgcGFydFR5cGU9IkdJVkVOIi8+CiAg
+ICAgIDxuYW1lUGFydCB2YWx1ZT0iIiBwYXJ0VHlwZT0iTUlERExFIi8+CiAgICAgIDxuYW1lUGFy
+dCB2YWx1ZT0iIiBwYXJ0VHlwZT0iU1VGRklYIi8+CiAgICAgIDxuYW1lUGFydCB2YWx1ZT0iIiBw
+YXJ0VHlwZT0iUFJFRklYIi8+CiAgICA8L3BhdGllbnROYW1lPgogICAgPGRhdGVPZkJpcnRoIHZh
+bHVlPSIiLz4KICAgIDxnZW5kZXIgY29kZVN5c3RlbT0iIiBjb2RlPSIiIGRpc3BsYXlOYW1lPSIi
+Lz4gICAgICA8IS0tIGNvZGVkIHZhbHVlIC0tPgogICAgPG1hcml0YWxTdGF0dXMgY29kZVN5c3Rl
+bT0iIiBjb2RlPSIiIGRpc3BsYXlOYW1lPSIiLz4gICAgIDwhLS0gY29kZWQgdmFsdWUgLS0+CiAg
+ICA8cHJpbWFyeUxhbmd1YWdlIGNvZGVTeXN0ZW09IiIgY29kZT0iIiBkaXNwbGF5TmFtZT0iIi8+
+ICAgICA8IS0tIGNvZGVkIHZhbHVlIC0tPgogICAgPGFkZHJlc3MgYWRkcmVzc1R5cGU9IiI+ICAg
+IDwhLS0gbXVsdGlwbGUgYWRkcmVzc2VzLCBhZGRyZXNzIHBhcnRzIC0tPgogICAgICA8YWRkcmVz
+c1BhcnQgdmFsdWU9IiIgcGFydFR5cGU9IlNUUkVFVDEiLz4KICAgICAgPGFkZHJlc3NQYXJ0IHZh
+bHVlPSIiIHBhcnRUeXBlPSJTVFJFRVQyIi8+CiAgICAgIDxhZGRyZXNzUGFydCB2YWx1ZT0iIiBw
+YXJ0VHlwZT0iQ0lUWSIvPgogICAgICA8YWRkcmVzc1BhcnQgdmFsdWU9IiIgcGFydFR5cGU9IlNU
+QVRFIi8+CiAgICAgIDxhZGRyZXNzUGFydCB2YWx1ZT0iIiBwYXJ0VHlwZT0iWklQIi8+CiAgICAg
+IDxhZGRyZXNzUGFydCB2YWx1ZT0iIiBwYXJ0VHlwZT0iQ09VTlRZQ09ERSIvPgogICAgICA8YWRk
+cmVzc1BhcnQgdmFsdWU9IiIgcGFydFR5cGU9IkNPVU5UUlkiLz4KICAgIDwvYWRkcmVzcz4KICAg
+IDx0ZWxlcGhvbmUgdHlwZT0iSFAiIHZhbHVlPSIiLz4gIDwhLS0gbXVsdGlwbGUtLT4KICAgIDx0
+ZWxlcGhvbmUgdHlwZT0iV1AiIHZhbHVlPSIiLz4gIDwhLS0gbXVsdGlwbGUtLT4KICAgIDxuZXh0
+T2ZLaW4vPiAgICA8IS0tIG5lZWRlZD8gIE1vZGVsPyAgLS0+CiAgICA8ZW5jb3VudGVyIGlkUm9v
+dD0iIiBpZEV4dGVuc2lvbj0iIj4KICAgICAgPHBhdGllbnRUeXBlIGNvZGVTeXN0ZW09IiIgY29k
+ZT0iIiBkaXNwbGF5TmFtZT0iIi8+CiAgICAgIDxwYXRpZW50TG9jYXRpb24+CiAgICAgICAgPGZh
+Y2lsaXR5IGlkUm9vdD0iIiBpZEV4dGVuc2lvbj0iIi8+IAogICAgICAgIDx1bml0IGlkUm9vdD0i
+IiBpZEV4dGVuc2lvbj0iIi8+CiAgICAgICAgPHJvb20gdmFsdWU9IiIvPiAgPCEtLSB2YWx1ZSBv
+ciBJRD8gLS0+CiAgICAgICAgPGJlZCB2YWx1ZT0iIi8+ICAgPCEtLSB2YWx1ZSBvciBJRD8gLS0+
+CiAgICAgIDwvcGF0aWVudExvY2F0aW9uPiAKICAgICAgPHBhdGllbnRDbGFzcyBjb2RlU3lzdGVt
+PSIiIGNvZGU9IiIgZGlzcGxheU5hbWU9IiIvPgogICAgICA8cmVhc29uRm9yVmlzaXQgdmFsdWU9
+IiIvPgogICAgICA8cmVmZXJyaW5nUGh5c2ljaWFuIGlkUm9vdD0iIiBpZEV4dGVuc2lvbj0iIi8+
+CiAgICAgIDxmaW5hbmNpYWxDbGFzcyBjb2RlU3lzdGVtPSIiIGNvZGU9IiIgZGlzcGxheU5hbWU9
+IiIvPgogICAgICA8aG9zcGl0YWxDb2RlIGNvZGVTeXN0ZW09IiIgY29kZT0iIiBkaXNwbGF5TmFt
+ZT0iIi8+CiAgICAgIDxob3NwaXRhbFNlcnZpY2VDb2RlIGNvZGVTeXN0ZW09IiIgY29kZT0iIiBk
+aXNwbGF5TmFtZT0iIi8+CiAgICA8L2VuY291bnRlcj4KICAgIDxvcmRlcj4KICAgICAgPGFjY2Vz
+c2lvbk51bWJlciBpZFJvb3Q9IiIgaWRFeHRlbnNpb249IiIvPgogICAgICA8cGxhY2VyT3JkZXJO
+dW1iZXIgaWRSb290PSIiIGlkRXh0ZW5zaW9uPSIiLz4KICAgICAgPHN0dWR5VGltZS1SZXF1ZXN0
+ZWQgdmFsdWU9IiIvPgogICAgICA8c3R1ZHlUaW1lLVN0YXJ0IHZhbHVlPSIiLz4KICAgICAgPHN0
+dWR5VGltZS1FbmQgdmFsdWU9IiIvPgogICAgICA8cGxhY2VPZlNjYW4gY29kZVN5c3RlbT0iIiBj
+b2RlPSIiIGRpc3BsYXlOYW1lPSIiLz4KICAgICAgPHByaW9yaXR5IGNvZGVTeXN0ZW09IiIgY29k
+ZT0iIiBkaXNwbGF5TmFtZT0iIi8+CiAgICAgIDxtb2RhbGl0eSBjb2RlU3lzdGVtPSIiIGNvZGU9
+IiIgZGlzcGxheU5hbWU9IiIvPgogICAgICA8cHJvY2VkdXJlIGNvZGVTeXN0ZW09IiIgY29kZT0i
+IiBkaXNwbGF5TmFtZT0iIi8+CiAgICAgIDxvcmRlckNvbnRyb2wgY29kZVN5c3RlbT0iIiBjb2Rl
+PSIiIGRpc3BsYXlOYW1lPSIiLz4KICAgICAgPHN0YXR1cyBjb2RlU3lzdGVtPSIiIGNvZGU9IiIg
+ZGlzcGxheU5hbWU9IiIvPgogICAgICA8dHlwZSBjb2RlU3lzdGVtPSIiIGNvZGU9IiIgZGlzcGxh
+eU5hbWU9IiIvPiAgPCEtLSA/Pz8gLS0+CiAgICAgIDx0ZWNobm9sb2dpc3QgaWRSb290PSIiIGlk
+RXh0ZW5zaW9uPSIiPgogICAgICAgIDxuYW1lPgogICAgICAgICAgPG5hbWVQYXJ0IHZhbHVlPSIi
+IHBhcnRUeXBlPSJGQU1JTFkiLz4KICAgICAgICAgIDxuYW1lUGFydCB2YWx1ZT0iIiBwYXJ0VHlw
+ZT0iR0lWRU4iLz4KICAgICAgICAgIDxuYW1lUGFydCB2YWx1ZT0iIiBwYXJ0VHlwZT0iTUlERExF
+Ii8+CiAgICAgICAgICA8bmFtZVBhcnQgdmFsdWU9IiIgcGFydFR5cGU9IlNVRkZJWCIvPgogICAg
+ICAgICAgPG5hbWVQYXJ0IHZhbHVlPSIiIHBhcnRUeXBlPSJQUkVGSVgiLz4KICAgICAgICA8L25h
+bWU+CiAgICAgIDwvdGVjaG5vbG9naXN0PgogICAgICA8b3JkZXJpbmdQcm92aWRlciBpZFJvb3Q9
+IiIgaWRFeHRlbnNpb249IiI+CiAgICAgICAgPHByb3ZpZGVyTmFtZT4KICAgICAgICAgIDxuYW1l
+UGFydCB2YWx1ZT0iIiBwYXJ0VHlwZT0iRkFNSUxZIi8+CiAgICAgICAgICA8bmFtZVBhcnQgdmFs
+dWU9IiIgcGFydFR5cGU9IkdJVkVOIi8+CiAgICAgICAgICA8bmFtZVBhcnQgdmFsdWU9IiIgcGFy
+dFR5cGU9Ik1JRERMRSIvPgogICAgICAgICAgPG5hbWVQYXJ0IHZhbHVlPSIiIHBhcnRUeXBlPSJT
+VUZGSVgiLz4KICAgICAgICAgIDxuYW1lUGFydCB2YWx1ZT0iIiBwYXJ0VHlwZT0iUFJFRklYIi8+
+CiAgICAgICAgPC9wcm92aWRlck5hbWU+CiAgICAgIDwvb3JkZXJpbmdQcm92aWRlcj4KICAgICAg
+PHJlYXNvbkZvckV4YW0gdmFsdWU9IiIvPgogICAgICA8dGVjaE5vdGVzIHZhbHVlPSIiLz4KICAg
+ICAgPGVuY291bnRlclJlZmVyZW5jZSBpZFJvb3Q9IiIgaWRFeHRlbnNpb249IiIvPgogICAgICA8
+UGxhY2VyRmllbGQxIHZhbHVlPSIiLz4KICAgICAgPFBsYWNlckZpZWxkMiB2YWx1ZT0iIi8+CiAg
+ICAgIDxGaWxsZXJGaWVsZDEgdmFsdWU9IiIvPgogICAgICA8RmlsbGVyRmllbGQyIHZhbHVlPSIi
+Lz4KICAgICAgPGN1c3RvbUZpZWxkIGluZGV4PSIiIHZhbHVlPSIiIC8+CiAgICAgIDxjdXN0b21G
+aWVsZCBpbmRleD0iIiB2YWx1ZT0iIiAvPgogICAgICA8Y3VzdG9tRmllbGQgaW5kZXg9IiIgdmFs
+dWU9IiIgLz4KICAgICAgPGN1c3RvbUZpZWxkIGluZGV4PSIiIHZhbHVlPSIiIC8+CiAgICAgIDxj
+dXN0b21GaWVsZCBpbmRleD0iIiB2YWx1ZT0iIiAvPgogICAgICA8Y3VzdG9tRmllbGQgaW5kZXg9
+IiIgdmFsdWU9IiIgLz4KPHJlc3VsdD4KICAgICAgPHN0YXR1cyBjb2RlU3lzdGVtPSIiIGNvZGU9
+IiIgZGlzcGxheU5hbWU9IiIvPgogICAgICA8aW50ZXJwcmV0dGluZ1Byb3ZpZGVyIGlkUm9vdD0i
+IiBpZEV4dGVuc2lvbj0iIiBwcm92aWRlclR5cGU9IiI+ICA8IS0tIGFjY291bnQgZm9yIG11bHRp
+cGxlcywgdHlwZSwgZXRjLi4uLS0+CiAgICAgICAgPHByb3ZpZGVySWQgaWRSb290PSIiIGlkRXh0
+ZW5zaW9uPSIiIGlkVHlwZT0iIi8+CiAgICAgICAgPHByb3ZpZGVySWQgaWRSb290PSIiIGlkRXh0
+ZW5zaW9uPSIiIGlkVHlwZT0iIi8+CiAgICAgICAgPHByb3ZpZGVyTmFtZT4KICAgICAgICAgIDxu
+YW1lUGFydCB2YWx1ZT0iIiBwYXJ0VHlwZT0iRkFNSUxZIi8+ICA8IS0tIG11bHRpcGxlIG5hbWUg
+cGFydHMgLS0+CiAgICAgICAgICA8bmFtZVBhcnQgdmFsdWU9IiIgcGFydFR5cGU9IkdJVkVOIi8+
+CiAgICAgICAgICA8bmFtZVBhcnQgdmFsdWU9IiIgcGFydFR5cGU9Ik1JRERMRSIvPgogICAgICAg
+ICAgPG5hbWVQYXJ0IHZhbHVlPSIiIHBhcnRUeXBlPSJTVUZGSVgiLz4KICAgICAgICAgIDxuYW1l
+UGFydCB2YWx1ZT0iIiBwYXJ0VHlwZT0iUFJFRklYIi8+CiAgICAgICAgPC9wcm92aWRlck5hbWU+
+CiAgICAgIDwvaW50ZXJwcmV0dGluZ1Byb3ZpZGVyPgogICAgICA8aW50ZXJwcmV0dGluZ1Byb3Zp
+ZGVyIGlkUm9vdD0iIiBpZEV4dGVuc2lvbj0iIiBwcm92aWRlclR5cGU9IiI+ICA8IS0tIGFjY291
+bnQgZm9yIG11bHRpcGxlcywgdHlwZSwgZXRjLi4uLS0+CiAgICAgICAgPHByb3ZpZGVySWQgaWRS
+b290PSIiIGlkRXh0ZW5zaW9uPSIiIGlkVHlwZT0iIi8+CiAgICAgICAgPHByb3ZpZGVySWQgaWRS
+b290PSIiIGlkRXh0ZW5zaW9uPSIiIGlkVHlwZT0iIi8+CiAgICAgICAgPHByb3ZpZGVyTmFtZT4K
+ICAgICAgICAgIDxuYW1lUGFydCB2YWx1ZT0iIiBwYXJ0VHlwZT0iRkFNSUxZIi8+ICA8IS0tIG11
+bHRpcGxlIG5hbWUgcGFydHMgLS0+CiAgICAgICAgICA8bmFtZVBhcnQgdmFsdWU9IiIgcGFydFR5
+cGU9IkdJVkVOIi8+CiAgICAgICAgICA8bmFtZVBhcnQgdmFsdWU9IiIgcGFydFR5cGU9Ik1JRERM
+RSIvPgogICAgICAgICAgPG5hbWVQYXJ0IHZhbHVlPSIiIHBhcnRUeXBlPSJTVUZGSVgiLz4KICAg
+ICAgICAgIDxuYW1lUGFydCB2YWx1ZT0iIiBwYXJ0VHlwZT0iUFJFRklYIi8+CiAgICAgICAgPC9w
+cm92aWRlck5hbWU+CiAgICAgIDwvaW50ZXJwcmV0dGluZ1Byb3ZpZGVyPgogICAgICA8cmVzdWx0
+VGltZS1TdGFydCB2YWx1ZT0iIi8+CiAgICAgIDxyZXN1bHRUaW1lLUVuZCB2YWx1ZT0iIi8+CiAg
+ICAgIDxnZW5lcmFsVGV4dC8+ICAgICAgPCEtLSBCbG9iLCB3aXRoIEVPTCBjaGFycyBpbiB0ZXh0
+IC0tPgogICAgICA8aW1wcmVzc2lvblRleHQvPgogICAgICA8YWRkZW5kdW1UZXh0Lz4KICAgICAg
+PEJJUkFEQ29kZSBjb2RlU3lzdGVtPSIiIGNvZGU9IiIgZGlzcGxheU5hbWU9IiIvPgogICAgICA8
+b3JkZXJSZWZlcmVuY2UgaWRSb290PSIiIGlkRXh0ZW5zaW9uPSIiLz4KICAgIDwvcmVzdWx0PgoJ
+PC9vcmRlcj4KICA8L3BhdGllbnQ+CjwvbWVzc2FnZT4K</outboundTemplate>
+      <inboundDataType>DELIMITED</inboundDataType>
+      <outboundDataType>XML</outboundDataType>
+      <inboundProperties class="com.mirth.connect.plugins.datatypes.delimited.DelimitedDataTypeProperties" version="3.4.0">
+        <serializationProperties class="com.mirth.connect.plugins.datatypes.delimited.DelimitedSerializationProperties" version="3.4.0">
+          <columnDelimiter>,</columnDelimiter>
+          <recordDelimiter>-~-$~</recordDelimiter>
+          <quoteToken>&quot;</quoteToken>
+          <escapeWithDoubleQuote>true</escapeWithDoubleQuote>
+          <quoteEscapeToken>\</quoteEscapeToken>
+          <numberedRows>false</numberedRows>
+          <ignoreCR>true</ignoreCR>
+        </serializationProperties>
+        <deserializationProperties class="com.mirth.connect.plugins.datatypes.delimited.DelimitedDeserializationProperties" version="3.4.0">
+          <columnDelimiter>,</columnDelimiter>
+          <recordDelimiter>\n</recordDelimiter>
+          <quoteToken>&quot;</quoteToken>
+          <escapeWithDoubleQuote>true</escapeWithDoubleQuote>
+          <quoteEscapeToken>\</quoteEscapeToken>
+        </deserializationProperties>
+        <batchProperties class="com.mirth.connect.plugins.datatypes.delimited.DelimitedBatchProperties" version="3.4.0">
+          <splitType>Record</splitType>
+          <batchSkipRecords>0</batchSkipRecords>
+          <batchMessageDelimiter></batchMessageDelimiter>
+          <batchMessageDelimiterIncluded>true</batchMessageDelimiterIncluded>
+          <batchGroupingColumn></batchGroupingColumn>
+          <batchScript></batchScript>
+        </batchProperties>
+      </inboundProperties>
+      <outboundProperties class="com.mirth.connect.plugins.datatypes.xml.XMLDataTypeProperties" version="3.4.0">
+        <serializationProperties class="com.mirth.connect.plugins.datatypes.xml.XMLSerializationProperties" version="3.4.0">
+          <stripNamespaces>true</stripNamespaces>
+        </serializationProperties>
+        <batchProperties class="com.mirth.connect.plugins.datatypes.xml.XMLBatchProperties" version="3.4.0">
+          <splitType>Element_Name</splitType>
+          <elementName></elementName>
+          <level>1</level>
+          <query></query>
+          <batchScript></batchScript>
+        </batchProperties>
+      </outboundProperties>
+    </transformer>
+    <filter version="3.4.0">
+      <rules/>
+    </filter>
+    <transportName>Channel Reader</transportName>
+    <mode>SOURCE</mode>
+    <enabled>true</enabled>
+    <waitForPrevious>true</waitForPrevious>
+  </sourceConnector>
+  <destinationConnectors>
+    <connector version="3.4.0">
+      <metaDataId>1</metaDataId>
+      <name>Prior result feeder</name>
+      <properties class="com.mirth.connect.connectors.vm.VmDispatcherProperties" version="3.4.0">
+        <pluginProperties/>
+        <destinationConnectorProperties version="3.4.0">
+          <queueEnabled>false</queueEnabled>
+          <sendFirst>false</sendFirst>
+          <retryIntervalMillis>10000</retryIntervalMillis>
+          <regenerateTemplate>false</regenerateTemplate>
+          <retryCount>0</retryCount>
+          <rotate>false</rotate>
+          <includeFilterTransformer>false</includeFilterTransformer>
+          <threadCount>1</threadCount>
+          <threadAssignmentVariable></threadAssignmentVariable>
+          <validateResponse>false</validateResponse>
+          <resourceIds class="linked-hash-map">
+            <entry>
+              <string>Default Resource</string>
+              <string>[Default Resource]</string>
+            </entry>
+          </resourceIds>
+          <queueBufferSize>1000</queueBufferSize>
+        </destinationConnectorProperties>
+        <channelId>8a9e7edf-4939-417f-9f33-499c919ba9a8</channelId>
+        <channelTemplate>${message.encodedData}</channelTemplate>
+        <mapVariables/>
+      </properties>
+      <transformer version="3.4.0">
+        <steps/>
+        <inboundDataType>XML</inboundDataType>
+        <outboundDataType>XML</outboundDataType>
+        <inboundProperties class="com.mirth.connect.plugins.datatypes.xml.XMLDataTypeProperties" version="3.4.0">
+          <serializationProperties class="com.mirth.connect.plugins.datatypes.xml.XMLSerializationProperties" version="3.4.0">
+            <stripNamespaces>true</stripNamespaces>
+          </serializationProperties>
+          <batchProperties class="com.mirth.connect.plugins.datatypes.xml.XMLBatchProperties" version="3.4.0">
+            <splitType>Element_Name</splitType>
+            <elementName></elementName>
+            <level>1</level>
+            <query></query>
+            <batchScript></batchScript>
+          </batchProperties>
+        </inboundProperties>
+        <outboundProperties class="com.mirth.connect.plugins.datatypes.xml.XMLDataTypeProperties" version="3.4.0">
+          <serializationProperties class="com.mirth.connect.plugins.datatypes.xml.XMLSerializationProperties" version="3.4.0">
+            <stripNamespaces>true</stripNamespaces>
+          </serializationProperties>
+          <batchProperties class="com.mirth.connect.plugins.datatypes.xml.XMLBatchProperties" version="3.4.0">
+            <splitType>Element_Name</splitType>
+            <elementName></elementName>
+            <level>1</level>
+            <query></query>
+            <batchScript></batchScript>
+          </batchProperties>
+        </outboundProperties>
+      </transformer>
+      <responseTransformer version="3.4.0">
+        <steps/>
+        <inboundDataType>XML</inboundDataType>
+        <outboundDataType>XML</outboundDataType>
+        <inboundProperties class="com.mirth.connect.plugins.datatypes.xml.XMLDataTypeProperties" version="3.4.0">
+          <serializationProperties class="com.mirth.connect.plugins.datatypes.xml.XMLSerializationProperties" version="3.4.0">
+            <stripNamespaces>true</stripNamespaces>
+          </serializationProperties>
+          <batchProperties class="com.mirth.connect.plugins.datatypes.xml.XMLBatchProperties" version="3.4.0">
+            <splitType>Element_Name</splitType>
+            <elementName></elementName>
+            <level>1</level>
+            <query></query>
+            <batchScript></batchScript>
+          </batchProperties>
+        </inboundProperties>
+        <outboundProperties class="com.mirth.connect.plugins.datatypes.xml.XMLDataTypeProperties" version="3.4.0">
+          <serializationProperties class="com.mirth.connect.plugins.datatypes.xml.XMLSerializationProperties" version="3.4.0">
+            <stripNamespaces>true</stripNamespaces>
+          </serializationProperties>
+          <batchProperties class="com.mirth.connect.plugins.datatypes.xml.XMLBatchProperties" version="3.4.0">
+            <splitType>Element_Name</splitType>
+            <elementName></elementName>
+            <level>1</level>
+            <query></query>
+            <batchScript></batchScript>
+          </batchProperties>
+        </outboundProperties>
+      </responseTransformer>
+      <filter version="3.4.0">
+        <rules/>
+      </filter>
+      <transportName>Channel Writer</transportName>
+      <mode>DESTINATION</mode>
+      <enabled>true</enabled>
+      <waitForPrevious>true</waitForPrevious>
+    </connector>
+  </destinationConnectors>
+  <preprocessingScript>// Modify the message variable below to pre process data
+// Modify the message variable below to pre process data
+var get_original_message = message
+channelMap.put(&apos;get_original_message&apos;,get_original_message);
+
+return message;</preprocessingScript>
+  <postprocessingScript>// This script executes once after a message has been processed
+// Responses returned from here will be stored as &quot;Postprocessor&quot; in the response map
+return;</postprocessingScript>
+  <deployScript>// This script executes once when the channel is deployed
+// You only have access to the globalMap and globalChannelMap here to persist data
+return;</deployScript>
+  <undeployScript>// This script executes once when the channel is undeployed
+// You only have access to the globalMap and globalChannelMap here to persist data
+return;</undeployScript>
+  <properties version="3.4.0">
+    <clearGlobalChannelMap>true</clearGlobalChannelMap>
+    <messageStorageMode>PRODUCTION</messageStorageMode>
+    <encryptData>false</encryptData>
+    <removeContentOnCompletion>false</removeContentOnCompletion>
+    <removeOnlyFilteredOnCompletion>false</removeOnlyFilteredOnCompletion>
+    <removeAttachmentsOnCompletion>false</removeAttachmentsOnCompletion>
+    <initialState>STARTED</initialState>
+    <storeAttachments>false</storeAttachments>
+    <tags class="linked-hash-set">
+      <string>LIMA</string>
+    </tags>
+    <metaDataColumns>
+      <metaDataColumn>
+        <name>PATIENT_ID</name>
+        <type>STRING</type>
+        <mappingName>patient_id</mappingName>
+      </metaDataColumn>
+      <metaDataColumn>
+        <name>ACCESSION_ID</name>
+        <type>STRING</type>
+        <mappingName>accession_number</mappingName>
+      </metaDataColumn>
+    </metaDataColumns>
+    <attachmentProperties version="3.4.0">
+      <type>None</type>
+      <properties/>
+    </attachmentProperties>
+    <pruneMetaDataDays>10</pruneMetaDataDays>
+    <archiveEnabled>true</archiveEnabled>
+    <resourceIds class="linked-hash-map">
+      <entry>
+        <string>Default Resource</string>
+        <string>[Default Resource]</string>
+      </entry>
+    </resourceIds>
+  </properties>
+  <codeTemplateLibraries/>
+</channel>
