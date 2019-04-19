@@ -1,0 +1,1169 @@
+<channel version="3.3.1">
+  <id>f84ec8dc-be8a-4756-a9ef-b601bdac5173</id>
+  <nextMetaDataId>2</nextMetaDataId>
+  <name>EDIX12 Generator 2</name>
+  <description></description>
+  <enabled>true</enabled>
+  <lastModified>
+    <time>1463740945944</time>
+    <timezone>Asia/Calcutta</timezone>
+  </lastModified>
+  <revision>222</revision>
+  <sourceConnector version="3.3.1">
+    <metaDataId>0</metaDataId>
+    <name>sourceConnector</name>
+    <properties class="com.mirth.connect.connectors.file.FileReceiverProperties" version="3.3.1">
+      <pluginProperties/>
+      <pollConnectorProperties version="3.3.1">
+        <pollingType>INTERVAL</pollingType>
+        <pollOnStart>true</pollOnStart>
+        <pollingFrequency>60000</pollingFrequency>
+        <pollingHour>0</pollingHour>
+        <pollingMinute>0</pollingMinute>
+        <cronJobs/>
+        <pollConnectorPropertiesAdvanced>
+          <weekly>true</weekly>
+          <inactiveDays>
+            <boolean>false</boolean>
+            <boolean>false</boolean>
+            <boolean>false</boolean>
+            <boolean>false</boolean>
+            <boolean>false</boolean>
+            <boolean>false</boolean>
+            <boolean>false</boolean>
+            <boolean>false</boolean>
+          </inactiveDays>
+          <dayOfMonth>1</dayOfMonth>
+          <allDay>true</allDay>
+          <startingHour>8</startingHour>
+          <startingMinute>0</startingMinute>
+          <endingHour>17</endingHour>
+          <endingMinute>0</endingMinute>
+        </pollConnectorPropertiesAdvanced>
+      </pollConnectorProperties>
+      <sourceConnectorProperties version="3.3.1">
+        <responseVariable>None</responseVariable>
+        <respondAfterProcessing>true</respondAfterProcessing>
+        <processBatch>false</processBatch>
+        <firstResponse>false</firstResponse>
+        <resourceIds class="singleton-set">
+          <string>Default Resource</string>
+        </resourceIds>
+      </sourceConnectorProperties>
+      <scheme>FILE</scheme>
+      <host>D:/EDIX12/JSON</host>
+      <fileFilter>ediX12newJson.json</fileFilter>
+      <regex>false</regex>
+      <directoryRecursion>false</directoryRecursion>
+      <ignoreDot>true</ignoreDot>
+      <anonymous>true</anonymous>
+      <username>anonymous</username>
+      <password>anonymous</password>
+      <timeout>10000</timeout>
+      <secure>true</secure>
+      <passive>true</passive>
+      <validateConnection>true</validateConnection>
+      <afterProcessingAction>NONE</afterProcessingAction>
+      <moveToDirectory></moveToDirectory>
+      <moveToFileName></moveToFileName>
+      <errorReadingAction>NONE</errorReadingAction>
+      <errorResponseAction>AFTER_PROCESSING</errorResponseAction>
+      <errorMoveToDirectory></errorMoveToDirectory>
+      <errorMoveToFileName></errorMoveToFileName>
+      <checkFileAge>true</checkFileAge>
+      <fileAge>1000</fileAge>
+      <fileSizeMinimum>0</fileSizeMinimum>
+      <fileSizeMaximum></fileSizeMaximum>
+      <ignoreFileSizeMaximum>true</ignoreFileSizeMaximum>
+      <sortBy>date</sortBy>
+      <binary>false</binary>
+      <charsetEncoding>DEFAULT_ENCODING</charsetEncoding>
+    </properties>
+    <transformer version="3.3.1">
+      <steps>
+        <step>
+          <sequenceNumber>0</sequenceNumber>
+          <name>EDI Generatorchannel</name>
+          <script>/* Setting Variables */
+var msgLength = msg.length;
+var objArray = [];
+var obj = {};
+
+var newXml = new XML(&quot;&lt;EDI&gt;&lt;/EDI&gt;&quot;);
+for (i = 0; i &lt; msgLength; i++) {
+    obj.ISAdata = msg[i][&apos;controlHeader&apos;];
+    obj.ISAdata1 = msg[i][&apos;controlHeader&apos;][&apos;authQualifier&apos;];
+    obj.ISAdata2 = msg[i][&apos;controlHeader&apos;][&apos;quthInfo&apos;];
+    obj.ISAdata3 = msg[i][&apos;controlHeader&apos;][&apos;secQulaifier&apos;];
+    obj.ISAdata4 = msg[i][&apos;controlHeader&apos;][&apos;secInfo&apos;];
+    obj.ISAdata5 = msg[i][&apos;controlHeader&apos;][&apos;IcQualifier&apos;];
+    obj.ISAdata6 = msg[i][&apos;controlHeader&apos;][&apos;IcSenderId&apos;];
+    obj.ISAdata7 = msg[i][&apos;controlHeader&apos;][&apos;IcReceiverId&apos;];
+    obj.ISAdata8 = msg[i][&apos;controlHeader&apos;][&apos;IcDate&apos;];
+    obj.ISAdata9 = msg[i][&apos;controlHeader&apos;][&apos;IcCVersion&apos;];
+
+    obj.GSdata = msg[i][&apos;functionalHeader&apos;];
+    obj.GSdata1 = msg[i][&apos;functionalHeader&apos;][&apos;func_id_code&apos;];
+    obj.GSdata2 = msg[i][&apos;functionalHeader&apos;][&apos;app_send_code&apos;];
+    obj.GSdata3 = msg[i][&apos;functionalHeader&apos;][&apos;app_rec_code&apos;];
+    obj.GSdata4 = msg[i][&apos;functionalHeader&apos;][&apos;date&apos;];
+    obj.GSdata5 = msg[i][&apos;functionalHeader&apos;][&apos;time&apos;];
+    obj.GSdata6 = msg[i][&apos;functionalHeader&apos;][&apos;grp_ctrl_no&apos;];
+    obj.GSdata7 = msg[i][&apos;functionalHeader&apos;][&apos;AgCode&apos;];
+    obj.GSdata8 = msg[i][&apos;functionalHeader&apos;][&apos;IiCode&apos;];
+
+    obj.STdata = msg[i][&apos;transactionHeader&apos;];
+    obj.STdata1 = msg[i][&apos;transactionHeader&apos;][&apos;ts_id_code&apos;];
+    obj.STdata2 = msg[i][&apos;transactionHeader&apos;][&apos;ts_ctrl_no&apos;];
+    obj.STdata3 = msg[i][&apos;transactionHeader&apos;][&apos;impl_conv_ref&apos;];
+
+    /* 1000A - Parsing submitter Information */
+
+    var submitterLength = msg[i][&apos;submitterInfo&apos;].length;
+    for (j = 0; j &lt; submitterLength; j++) {
+        obj.NM1data = msg[i][&apos;submitterInfo&apos;][j][&apos;submitterName&apos;];
+        obj.NM1data1 = msg[i][&apos;submitterInfo&apos;][j][&apos;submitterName&apos;][&apos;EidCode&apos;];
+        obj.NM1data2 = msg[i][&apos;submitterInfo&apos;][j][&apos;submitterName&apos;][&apos;EtypeQualifier&apos;];
+        obj.NM1data3 = msg[i][&apos;submitterInfo&apos;][j][&apos;submitterName&apos;][&apos;orgName&apos;];
+        obj.NM1data4 = msg[i][&apos;submitterInfo&apos;][j][&apos;submitterName&apos;][&apos;name_first&apos;];
+        obj.NM1data5 = msg[i][&apos;submitterInfo&apos;][j][&apos;submitterName&apos;][&apos;name_middle&apos;];
+        obj.NM1data6 = msg[i][&apos;submitterInfo&apos;][j][&apos;submitterName&apos;][&apos;IdCodeQualifier&apos;];
+        obj.NM1data7 = msg[i][&apos;submitterInfo&apos;][j][&apos;submitterName&apos;][&apos;IdCode&apos;];
+
+        obj.PERdata = msg[i][&apos;submitterInfo&apos;][j][&apos;submitterContact&apos;];
+        obj.PERdata1 = msg[i][&apos;submitterInfo&apos;][j][&apos;submitterContact&apos;][&apos;func_code&apos;];
+        obj.PERdata2 = msg[i][&apos;submitterInfo&apos;][j][&apos;submitterContact&apos;][&apos;name&apos;];
+        obj.PERdata3 = msg[i][&apos;submitterInfo&apos;][j][&apos;submitterContact&apos;][&apos;comm_qualifier&apos;];
+        obj.PERdata4 = msg[i][&apos;submitterInfo&apos;][j][&apos;submitterContact&apos;][&apos;comm_number&apos;];
+    }
+
+    /* 1000B - Parsing receiver information */
+
+    var receiverInfoLength = msg[i][&apos;receiverInfo&apos;].length;
+    for (recInfo = 0; recInfo &lt; receiverInfoLength; recInfo++) {
+        obj.EidCode = msg[i][&apos;receiverInfo&apos;][recInfo][&apos;receiverName&apos;][&apos;EidCode&apos;];
+        obj.EtypeQualifier = msg[i][&apos;receiverInfo&apos;][recInfo][&apos;receiverName&apos;][&apos;EtypeQualifier&apos;];
+        obj.orgName = msg[i][&apos;receiverInfo&apos;][recInfo][&apos;receiverName&apos;][&apos;orgName&apos;];
+        obj.IdCodeQualifier = msg[i][&apos;receiverInfo&apos;][recInfo][&apos;receiverName&apos;][&apos;IdCodeQualifier&apos;];
+        obj.IdCode = msg[i][&apos;receiverInfo&apos;][recInfo][&apos;receiverName&apos;][&apos;IdCode&apos;];
+    }
+
+    /*2000A - Parsing billing information */
+
+    var providerLength = msg[i][&apos;billingInfo&apos;].length;
+    for (billLen = 0; billLen &lt; providerLength; billLen++) {
+        obj.HLId = msg[i][&apos;billingInfo&apos;][billLen][&apos;heighrarcy_Level&apos;][&apos;IdNo&apos;];
+        obj.HLLevelcode = msg[i][&apos;billingInfo&apos;][billLen][&apos;heighrarcy_Level&apos;][&apos;levelCode&apos;];
+        obj.child_code = msg[i][&apos;billingInfo&apos;][billLen][&apos;heighrarcy_Level&apos;][&apos;childCode&apos;];
+
+        obj.pro_code = msg[i][&apos;billingInfo&apos;][billLen][&apos;providerInfo&apos;][&apos;providerCode&apos;];
+        obj.ref_ID_qualifier = msg[i][&apos;billingInfo&apos;][billLen][&apos;providerInfo&apos;][&apos;ref_id_qualifier&apos;];
+        obj.ref_ID = msg[i][&apos;billingInfo&apos;][billLen][&apos;providerInfo&apos;][&apos;ref_id&apos;];
+    }
+
+    /*2010AA - Parsing Billing Provider */
+
+    var ProLength = msg[i][&apos;billingProvider&apos;].length;
+    for (billProLen = 0; billProLen &lt; ProLength; billProLen++) {
+        obj.EidCode = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerName&apos;][&apos;EidCode&apos;];
+        obj.EtypeQualifier = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerName&apos;][&apos;EtypeQualifier&apos;];
+        obj.orgName = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerName&apos;][&apos;orgName&apos;];
+        obj.name_first = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerName&apos;][&apos;name_first&apos;];
+        obj.name_middle = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerName&apos;][&apos;name_middle&apos;];
+        obj.name_suffix = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerName&apos;][&apos;name_suffix&apos;];
+        obj.IdCodeQualifier = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerName&apos;][&apos;IdCodeQualifier&apos;];
+        obj.IdCode = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerName&apos;][&apos;IdCode&apos;];
+
+        obj.address1 = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerAddress&apos;][&apos;address_a&apos;];
+        obj.address2 = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerAddress&apos;][&apos;address_b&apos;];
+
+        obj.cityName = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerDetail&apos;][&apos;cityName&apos;];
+        obj.stateCode = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerDetail&apos;][&apos;stateCode&apos;];
+        obj.postalCode = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerDetail&apos;][&apos;postalCode&apos;];
+        obj.countryCode = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerDetail&apos;][&apos;countryCode&apos;];
+        obj.subdivisionCode = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerDetail&apos;][&apos;subdivisionCode&apos;];
+
+        obj.ref_id_qualifier = msg[i][&apos;billingProvider&apos;][billProLen][&apos;taxDetail&apos;][&apos;ref_id_qualifier&apos;];
+        obj.ref_id = msg[i][&apos;billingProvider&apos;][billProLen][&apos;taxDetail&apos;][&apos;ref_id&apos;];
+
+    }
+
+
+
+    /* Parsing subscriber Information */
+    var subsLen = msg[i][&apos;subscriberInformation&apos;].length;
+    for (subscribe = 0; subscribe &lt; subsLen; subscribe++) {
+        obj.EidCode = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberName&apos;][&apos;EidCode&apos;];
+        obj.EtypeQualifier = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberName&apos;][&apos;EtypeQualifier&apos;];
+        obj.orgName = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberName&apos;][&apos;orgName&apos;];
+        obj.name_first = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberName&apos;][&apos;name_first&apos;];
+        obj.name_middle = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberName&apos;][&apos;name_middle&apos;];
+        obj.IcQualifier = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberName&apos;][&apos;IcQualifier&apos;];
+        obj.IdCode = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberName&apos;][&apos;IdCode&apos;];
+
+        obj.address1 = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberAddress&apos;][&apos;address_a&apos;];
+        obj.address2 = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberAddress&apos;][&apos;address_b&apos;];
+
+        obj.cityName = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberDetails&apos;][&apos;cityName&apos;];
+        obj.stateCode = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberDetails&apos;][&apos;stateCode&apos;];
+        obj.postalCode = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberDetails&apos;][&apos;postalCode&apos;];
+        obj.countryCode = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberDetails&apos;][&apos;countryCode&apos;];
+        obj.subdivisionCode = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberDetails&apos;][&apos;subdivisionCode&apos;];
+
+        obj.date_time_format = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberDemographics&apos;][&apos;date_time_format&apos;];
+        obj.date_time_period = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberDemographics&apos;][&apos;date_time_period&apos;];
+        obj.genderCode = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberDemographics&apos;][&apos;genderCode&apos;];
+    }
+
+
+    /* 2010BA - Parsing payer Information */
+
+    var payerlen = msg[i][&apos;payerInformation&apos;].length;
+    for (payer = 0; payer &lt; payerlen; payer++) {
+        obj.EidCode = msg[i][&apos;payerInformation&apos;][payer][&apos;payerName&apos;][&apos;EidCode&apos;];
+        obj.EtypeQualifier = msg[i][&apos;payerInformation&apos;][payer][&apos;payerName&apos;][&apos;EtypeQualifier&apos;];
+        obj.orgName = msg[i][&apos;payerInformation&apos;][payer][&apos;payerName&apos;][&apos;orgName&apos;];
+        obj.IcQualifier = msg[i][&apos;payerInformation&apos;][payer][&apos;payerName&apos;][&apos;IdCodeQualifier&apos;];
+        obj.IdCode = msg[i][&apos;payerInformation&apos;][payer][&apos;payerName&apos;][&apos;IdCode&apos;];
+
+        obj.address1 = msg[i][&apos;payerInformation&apos;][payer][&apos;payerAddress&apos;][&apos;address_a&apos;];
+        obj.address2 = msg[i][&apos;payerInformation&apos;][payer][&apos;payerAddress&apos;][&apos;address_b&apos;];
+
+        obj.cityName = msg[i][&apos;payerInformation&apos;][payer][&apos;payerDetail&apos;][&apos;cityName&apos;];
+        obj.stateCode = msg[i][&apos;payerInformation&apos;][payer][&apos;payerDetail&apos;][&apos;stateCode&apos;];
+        obj.postalCode = msg[i][&apos;payerInformation&apos;][payer][&apos;payerDetail&apos;][&apos;postalCode&apos;];
+        obj.countryCode = msg[i][&apos;payerInformation&apos;][payer][&apos;payerDetail&apos;][&apos;countryCode&apos;];
+        obj.subdivisionCode = msg[i][&apos;payerInformation&apos;][payer][&apos;payerDetail&apos;][&apos;subdivisionCode&apos;];
+    }
+
+
+    /* 2300 - Parsing claim Information */
+
+    var claimlen = msg[i][&apos;ClaimDetails&apos;].length;
+    for (claim = 0; claim &lt; claimlen; claim++) {
+        obj.submitterId = msg[i][&apos;ClaimDetails&apos;][claim][&apos;claimInformation&apos;][&apos;submitterId&apos;];
+        obj.amount = msg[i][&apos;ClaimDetails&apos;][claim][&apos;claimInformation&apos;][&apos;amount&apos;];
+        obj.serviceLocation = msg[i][&apos;ClaimDetails&apos;][claim][&apos;claimInformation&apos;][&apos;serivceLocation&apos;];
+        obj.code_value = msg[i][&apos;ClaimDetails&apos;][claim][&apos;claimInformation&apos;][&apos;code_value&apos;];
+        obj.code_qualifier = msg[i][&apos;ClaimDetails&apos;][claim][&apos;claimInformation&apos;][&apos;code_qualifier&apos;];
+        obj.type_code = msg[i][&apos;ClaimDetails&apos;][claim][&apos;claimInformation&apos;][&apos;type_code&apos;];
+        obj.response_code = msg[i][&apos;ClaimDetails&apos;][claim][&apos;claimInformation&apos;][&apos;response_code&apos;];
+        obj.assingment_code = msg[i][&apos;ClaimDetails&apos;][claim][&apos;claimInformation&apos;][&apos;assingment_code&apos;];
+        obj.info_code = msg[i][&apos;ClaimDetails&apos;][claim][&apos;claimInformation&apos;][&apos;info_code&apos;];
+
+        obj.date_time_qual = msg[i][&apos;ClaimDetails&apos;][claim][&apos;lastSeenInformation&apos;][&apos;date_time_qual&apos;];
+        obj.format_qual = msg[i][&apos;ClaimDetails&apos;][claim][&apos;lastSeenInformation&apos;][&apos;format_qual&apos;];
+        obj.date_time_period = msg[i][&apos;ClaimDetails&apos;][claim][&apos;lastSeenInformation&apos;][&apos;date_time_period&apos;];
+
+        obj.code_information = msg[i][&apos;ClaimDetails&apos;][claim][&apos;diagnosisInformation&apos;][&apos;code_information&apos;];
+        obj.qualifier_code = msg[i][&apos;ClaimDetails&apos;][claim][&apos;diagnosisInformation&apos;][&apos;qualifier_code&apos;];
+        obj.industry_code = msg[i][&apos;ClaimDetails&apos;][claim][&apos;diagnosisInformation&apos;][&apos;industry_code&apos;];
+
+    }
+
+    //Parsing Trailer Data
+    obj.SEdata = msg[i][&apos;transactionSegment&apos;];
+    obj.SEdata1 = msg[i][&apos;transactionSegment&apos;][&apos;segment_id&apos;];
+    obj.SEdata2 = msg[i][&apos;transactionSegment&apos;][&apos;data_enroll&apos;];
+
+    obj.GEdata = msg[i][&apos;transactionSets&apos;];
+    obj.GEdata1 = msg[i][&apos;transactionSets&apos;][&apos;fg_transmission&apos;];
+    obj.GEdata2 = msg[i][&apos;transactionSets&apos;][&apos;control_number&apos;];
+
+    obj.IEAdata = msg[i][&apos;interchangeControl&apos;];
+    obj.IEAdata1 = msg[i][&apos;interchangeControl&apos;][&apos;intr_pairs&apos;];
+    obj.IEAdata2 = msg[i][&apos;interchangeControl&apos;][&apos;control_number&apos;];
+}
+
+/*constructing Header*/
+
+newXml[&apos;ISA&apos;];
+newXml[&apos;ISA&apos;][&apos;ISA.01&apos;] = obj.ISAdata1;
+newXml[&apos;ISA&apos;][&apos;ISA.02&apos;] = obj.ISAdata2;
+newXml[&apos;ISA&apos;][&apos;ISA.03&apos;] = obj.ISAdata3;
+newXml[&apos;ISA&apos;][&apos;ISA.04&apos;] = obj.ISAdata4;
+newXml[&apos;ISA&apos;][&apos;ISA.05&apos;] = obj.ISAdata5;
+newXml[&apos;ISA&apos;][&apos;ISA.06&apos;] = obj.ISAdata6;
+newXml[&apos;ISA&apos;][&apos;ISA.07&apos;] = obj.ISAdata7;
+newXml[&apos;ISA&apos;][&apos;ISA.08&apos;] = obj.ISAdata8;
+newXml[&apos;ISA&apos;][&apos;ISA.09&apos;] = obj.ISAdata9;
+
+newXml[&apos;GS&apos;];
+newXml[&apos;GS&apos;][&apos;GS.01&apos;] = obj.GSdata1;
+newXml[&apos;GS&apos;][&apos;GS.02&apos;] = obj.GSdata2;
+newXml[&apos;GS&apos;][&apos;GS.03&apos;] = obj.GSdata3;
+newXml[&apos;GS&apos;][&apos;GS.04&apos;] = obj.GSdata4;
+newXml[&apos;GS&apos;][&apos;GS.05&apos;] = obj.GSdata5;
+newXml[&apos;GS&apos;][&apos;GS.06&apos;] = obj.GSdata6;
+newXml[&apos;GS&apos;][&apos;GS.07&apos;] = obj.GSdata7;
+newXml[&apos;GS&apos;][&apos;GS.08&apos;] = obj.GSdata8;
+
+newXml[&apos;ST&apos;];
+newXml[&apos;ST&apos;][&apos;ST.01&apos;] = obj.STdata1;
+newXml[&apos;ST&apos;][&apos;ST.02&apos;] = obj.STdata2;
+newXml[&apos;ST&apos;][&apos;ST.03&apos;] = obj.STdata3;
+
+/* Constructing loop - 1000A XML */
+
+newXml[&apos;NM1&apos;];
+newXml[&apos;NM1&apos;][&apos;NM1.01&apos;] = obj.NM1data1;
+newXml[&apos;NM1&apos;][&apos;NM1.02&apos;] = obj.NM1data2;
+newXml[&apos;NM1&apos;][&apos;NM1.03&apos;] = obj.NM1data3;
+newXml[&apos;NM1&apos;][&apos;NM1.04&apos;] = obj.NM1data4;
+newXml[&apos;NM1&apos;][&apos;NM1.05&apos;] = obj.NM1data5;
+newXml[&apos;NM1&apos;][&apos;NM1.06&apos;] = obj.NM1data6;
+newXml[&apos;NM1&apos;][&apos;NM1.07&apos;] = obj.NM1data7;
+
+newXml[&apos;PER&apos;];
+newXml[&apos;PER&apos;][&apos;PER.01&apos;] = obj.PERdata1;
+newXml[&apos;PER&apos;][&apos;PER.02&apos;] = obj.PERdata2;
+newXml[&apos;PER&apos;][&apos;PER.03&apos;] = obj.PERdata3;
+newXml[&apos;PER&apos;][&apos;PER.04&apos;] = obj.PERdata4;
+
+var loop1000A = SerializerFactory.getSerializer(&apos;EDI/X12&apos;).fromXML(newXml);
+
+/* Constructing loop - 1000B XML */
+
+var recInfo = new XML(&quot;&lt;RI&gt;&lt;/RI&gt;&quot;);
+
+recInfo[&apos;NM1&apos;];
+recInfo[&apos;NM1&apos;][&apos;NM1.01&apos;] = obj.EidCode;
+recInfo[&apos;NM1&apos;][&apos;NM1.02&apos;] = obj.EtypeQualifier;
+recInfo[&apos;NM1&apos;][&apos;NM1.03&apos;] = obj.orgName;
+recInfo[&apos;NM1&apos;][&apos;NM1.08&apos;]= obj.IdCodeQualifier;
+recInfo[&apos;NM1&apos;][&apos;NM1.09&apos;] = obj.IdCode;
+
+var loop1000B = SerializerFactory.getSerializer(&apos;EDI/X12&apos;).fromXML(recInfo);
+
+/* Constructing loop - 2000A XML */
+
+
+var billInfo = new XML(&quot;&lt;BI&gt;&lt;/BI&gt;&quot;);
+
+billInfo[&apos;HL&apos;];
+billInfo[&apos;HL&apos;][&apos;HL.01&apos;] = obj.HLId;
+billInfo[&apos;HL&apos;][&apos;HL.03&apos;] = obj.HLLevelcode;
+billInfo[&apos;HL&apos;][&apos;HL.04&apos;] = obj.child_code;
+
+billInfo[&apos;PRV&apos;];
+billInfo[&apos;PRV&apos;][&apos;PRV.01&apos;] = obj.pro_code;
+billInfo[&apos;PRV&apos;][&apos;PRV.02&apos;] = obj.ref_ID_qualifier;
+billInfo[&apos;PRV&apos;][&apos;PRV.03&apos;] = obj.ref_ID;
+
+var loop2000A = SerializerFactory.getSerializer(&apos;EDI/X12&apos;).fromXML(billInfo);
+
+
+/* Constructing loop - 2010AA XML */
+
+var billproviderInfo = new XML(&quot;&lt;BP&gt;&lt;/BP&gt;&quot;);
+
+billproviderInfo[&apos;NM1&apos;];
+billproviderInfo[&apos;NM1&apos;][&apos;NM1.01&apos;] = obj.EidCode;
+billproviderInfo[&apos;NM1&apos;][&apos;NM1.02&apos;] = obj.EtypeQualifier;
+billproviderInfo[&apos;NM1&apos;][&apos;NM1.03&apos;] = obj.orgName;
+billproviderInfo[&apos;NM1&apos;][&apos;NM1.04&apos;] = obj.name_first;
+billproviderInfo[&apos;NM1&apos;][&apos;NM1.05&apos;] = obj.name_middle;
+billproviderInfo[&apos;NM1&apos;][&apos;NM1.06&apos;] = obj.name_suffix;
+billproviderInfo[&apos;NM1&apos;][&apos;NM1.07&apos;] = obj.IdCodeQualifier;
+billproviderInfo[&apos;NM1&apos;][&apos;NM1.08&apos;] = obj.IdCode;
+
+
+billproviderInfo[&apos;N3&apos;];
+billproviderInfo[&apos;N3&apos;][&apos;N3.01&apos;] = obj.address1;
+billproviderInfo[&apos;N3&apos;][&apos;N3.02&apos;] = obj.address2;
+
+
+billproviderInfo[&apos;N4&apos;];
+billproviderInfo[&apos;N4&apos;][&apos;N4.01&apos;] = obj.cityName;
+billproviderInfo[&apos;N4&apos;][&apos;N4.02&apos;] = obj.stateCode;
+billproviderInfo[&apos;N4&apos;][&apos;N4.03&apos;] = obj.postalCode;
+billproviderInfo[&apos;N4&apos;][&apos;N4.04&apos;] = obj.countryCode;
+billproviderInfo[&apos;N4&apos;][&apos;N4.07&apos;] = obj.subdivisionCode;
+
+billproviderInfo[&apos;REF&apos;];
+billproviderInfo[&apos;REF&apos;][&apos;REF.01&apos;] = obj.ref_id_qualifier;
+billproviderInfo[&apos;REF&apos;][&apos;REF.02&apos;] = obj.ref_id;
+
+
+var loop2010AA = SerializerFactory.getSerializer(&apos;EDI/X12&apos;).fromXML(billproviderInfo);
+
+
+/* Constructing loop - 2010BA XML */
+
+
+var subsInfo = new XML(&quot;&lt;SI&gt;&lt;/SI&gt;&quot;);
+
+subsInfo[&apos;NM1&apos;]
+subsInfo[&apos;NM1&apos;][&apos;NM1.01&apos;] = obj.EidCode;
+subsInfo[&apos;NM1&apos;][&apos;NM1.02&apos;] = obj.EtypeQualifier;
+subsInfo[&apos;NM1&apos;][&apos;NM1.03&apos;] = obj.orgName;
+subsInfo[&apos;NM1&apos;][&apos;NM1.08&apos;] = obj.IcQualifier;
+subsInfo[&apos;NM1&apos;][&apos;NM1.09&apos;] = obj.IdCode;
+
+subsInfo[&apos;N3&apos;];
+subsInfo[&apos;N3&apos;][&apos;N3.01&apos;] = obj.address1;
+subsInfo[&apos;N3&apos;][&apos;N3.02&apos;] = obj.address2;
+
+subsInfo[&apos;N4&apos;];
+subsInfo[&apos;N4&apos;][&apos;N4.01&apos;] = obj.cityName;
+subsInfo[&apos;N4&apos;][&apos;N4.02&apos;] = obj.stateCode;
+subsInfo[&apos;N4&apos;][&apos;N4.03&apos;] = obj.postalCode;
+subsInfo[&apos;N4&apos;][&apos;N4.04&apos;] = obj.countryCode;
+subsInfo[&apos;N4&apos;][&apos;N4.07&apos;] = obj.subdivisionCode;
+
+subsInfo[&apos;REF&apos;];
+subsInfo[&apos;REF&apos;][&apos;REF.01&apos;] = obj.date_time_format;
+subsInfo[&apos;REF&apos;][&apos;REF.02&apos;] = obj.date_time_period;
+subsInfo[&apos;REF&apos;][&apos;REF.03&apos;] = obj.genderCode;
+
+var loop2010BA = SerializerFactory.getSerializer(&apos;EDI/X12&apos;).fromXML(subsInfo);
+
+/* Constructing loop - 2010BB XML */
+
+var payerInfo = new XML(&quot;&lt;PI&gt;&lt;/PI&gt;&quot;);
+
+payerInfo[&apos;NM1&apos;];
+payerInfo[&apos;NM1&apos;][&apos;NM1.01&apos;] = obj.EidCode;
+payerInfo[&apos;NM1&apos;][&apos;NM1.02&apos;] = obj.EtypeQualifier;
+payerInfo[&apos;NM1&apos;][&apos;NM1.03&apos;] = obj.orgName;
+payerInfo[&apos;NM1&apos;][&apos;NM1.08&apos;] = obj.IcQualifier;
+payerInfo[&apos;NM1&apos;][&apos;NM1.09&apos;] = obj.IdCode;
+
+payerInfo[&apos;N3&apos;];
+payerInfo[&apos;N3&apos;][&apos;N3.01&apos;] = obj.address1;
+payerInfo[&apos;N3&apos;][&apos;N3.02&apos;] = obj.address2;
+
+payerInfo[&apos;N4&apos;];
+payerInfo[&apos;N4&apos;][&apos;N4.01&apos;] = obj.cityName;
+payerInfo[&apos;N4&apos;][&apos;N4.02&apos;] = obj.stateCode;
+payerInfo[&apos;N4&apos;][&apos;N4.03&apos;] = obj.postalCode;
+payerInfo[&apos;N4&apos;][&apos;N4.04&apos;] = obj.countryCode;
+payerInfo[&apos;N4&apos;][&apos;N4.07&apos;] = obj.subdivisionCode;
+
+var loop2010BB = SerializerFactory.getSerializer(&apos;EDI/X12&apos;).fromXML(payerInfo);
+
+/* Constructing loop 2300  */
+
+var claimInfo = new XML(&quot;&lt;CI&gt;&lt;/CI&gt;&quot;);
+
+claimInfo[&apos;CLM&apos;];
+claimInfo[&apos;CLM&apos;][&apos;CLM.01&apos;] = obj.submitterId;
+claimInfo[&apos;CLM&apos;][&apos;CLM.02&apos;] = obj.amount;
+claimInfo[&apos;CLM&apos;][&apos;CLM.05&apos;] = obj.serviceLocation;
+claimInfo[&apos;CLM&apos;][&apos;CLM.05-1&apos;] = obj.code_value;
+claimInfo[&apos;CLM&apos;][&apos;CLM.05-2&apos;] = obj.code_qualifier;
+claimInfo[&apos;CLM&apos;][&apos;CLM.05-3&apos;] = obj.type_code;
+claimInfo[&apos;CLM&apos;][&apos;CLM.06&apos;] = obj.response_code;
+claimInfo[&apos;CLM&apos;][&apos;CLM.07&apos;] = obj.assingment_code;
+claimInfo[&apos;CLM&apos;][&apos;CLM.08&apos;] = obj.response_code;
+claimInfo[&apos;CLM&apos;][&apos;CLM.09&apos;] = obj.info_code;
+
+claimInfo[&apos;DTP&apos;];
+claimInfo[&apos;DTP&apos;][&apos;DTP.01&apos;] = obj.date_time_qual;
+claimInfo[&apos;DTP&apos;][&apos;DTP.02&apos;] = obj.format_qual;
+claimInfo[&apos;DTP&apos;][&apos;DTP.03&apos;] = obj.date_time_period;
+
+claimInfo[&apos;HI&apos;];
+claimInfo[&apos;HI.01&apos;] = obj.code_information;
+claimInfo[&apos;HI.02&apos;] = obj.qualifier_code;
+claimInfo[&apos;HI.03&apos;] = obj.industry_code;
+
+var loop2300 = SerializerFactory.getSerializer(&apos;EDI/X12&apos;).fromXML(claimInfo);
+
+
+//Constructing Trailer segments
+var TrailData = new XML(&quot;&lt;SE&gt;&lt;/SE&gt;&quot;);
+TrailData[&apos;SE&apos;];
+TrailData[&apos;SE&apos;][&apos;SE.01&apos;] = obj.SEdata1;
+TrailData[&apos;SE&apos;][&apos;SE.02&apos;] = obj.SEdata2;
+
+TrailData[&apos;GE&apos;];
+TrailData[&apos;GE&apos;][&apos;GE.01&apos;] = obj.GEdata1;
+TrailData[&apos;GE&apos;][&apos;GE.02&apos;] = obj.GEdata2;
+
+TrailData[&apos;IEA&apos;];
+TrailData[&apos;IEA&apos;][&apos;IEA.01&apos;] = obj.IEAdata1;
+TrailData[&apos;IEA&apos;][&apos;IEA.02&apos;] = obj.IEAdata2;
+
+var loop2440 = SerializerFactory.getSerializer(&apos;EDI/X12&apos;).fromXML(TrailData);
+
+
+/* Consolidating Loops */
+
+var data = loop1000A + loop1000B + loop2000A + loop2010AA + loop2010BA + loop2010BB + loop2300 + loop2440;
+
+/* Generating ChannelVariable for access */
+
+channelMap.put(&apos;serialize&apos;, data);
+
+/* Printing EDI Message in console */
+
+logger.info(&quot;EDI message : &quot; + data);</script>
+          <type>JavaScript</type>
+          <data>
+            <entry>
+              <string>Script</string>
+              <string>/* Setting Variables */
+var msgLength = msg.length;
+var objArray = [];
+var obj = {};
+
+var newXml = new XML(&quot;&lt;EDI&gt;&lt;/EDI&gt;&quot;);
+for (i = 0; i &lt; msgLength; i++) {
+    obj.ISAdata = msg[i][&apos;controlHeader&apos;];
+    obj.ISAdata1 = msg[i][&apos;controlHeader&apos;][&apos;authQualifier&apos;];
+    obj.ISAdata2 = msg[i][&apos;controlHeader&apos;][&apos;quthInfo&apos;];
+    obj.ISAdata3 = msg[i][&apos;controlHeader&apos;][&apos;secQulaifier&apos;];
+    obj.ISAdata4 = msg[i][&apos;controlHeader&apos;][&apos;secInfo&apos;];
+    obj.ISAdata5 = msg[i][&apos;controlHeader&apos;][&apos;IcQualifier&apos;];
+    obj.ISAdata6 = msg[i][&apos;controlHeader&apos;][&apos;IcSenderId&apos;];
+    obj.ISAdata7 = msg[i][&apos;controlHeader&apos;][&apos;IcReceiverId&apos;];
+    obj.ISAdata8 = msg[i][&apos;controlHeader&apos;][&apos;IcDate&apos;];
+    obj.ISAdata9 = msg[i][&apos;controlHeader&apos;][&apos;IcCVersion&apos;];
+
+    obj.GSdata = msg[i][&apos;functionalHeader&apos;];
+    obj.GSdata1 = msg[i][&apos;functionalHeader&apos;][&apos;func_id_code&apos;];
+    obj.GSdata2 = msg[i][&apos;functionalHeader&apos;][&apos;app_send_code&apos;];
+    obj.GSdata3 = msg[i][&apos;functionalHeader&apos;][&apos;app_rec_code&apos;];
+    obj.GSdata4 = msg[i][&apos;functionalHeader&apos;][&apos;date&apos;];
+    obj.GSdata5 = msg[i][&apos;functionalHeader&apos;][&apos;time&apos;];
+    obj.GSdata6 = msg[i][&apos;functionalHeader&apos;][&apos;grp_ctrl_no&apos;];
+    obj.GSdata7 = msg[i][&apos;functionalHeader&apos;][&apos;AgCode&apos;];
+    obj.GSdata8 = msg[i][&apos;functionalHeader&apos;][&apos;IiCode&apos;];
+
+    obj.STdata = msg[i][&apos;transactionHeader&apos;];
+    obj.STdata1 = msg[i][&apos;transactionHeader&apos;][&apos;ts_id_code&apos;];
+    obj.STdata2 = msg[i][&apos;transactionHeader&apos;][&apos;ts_ctrl_no&apos;];
+    obj.STdata3 = msg[i][&apos;transactionHeader&apos;][&apos;impl_conv_ref&apos;];
+
+    /* 1000A - Parsing submitter Information */
+
+    var submitterLength = msg[i][&apos;submitterInfo&apos;].length;
+    for (j = 0; j &lt; submitterLength; j++) {
+        obj.NM1data = msg[i][&apos;submitterInfo&apos;][j][&apos;submitterName&apos;];
+        obj.NM1data1 = msg[i][&apos;submitterInfo&apos;][j][&apos;submitterName&apos;][&apos;EidCode&apos;];
+        obj.NM1data2 = msg[i][&apos;submitterInfo&apos;][j][&apos;submitterName&apos;][&apos;EtypeQualifier&apos;];
+        obj.NM1data3 = msg[i][&apos;submitterInfo&apos;][j][&apos;submitterName&apos;][&apos;orgName&apos;];
+        obj.NM1data4 = msg[i][&apos;submitterInfo&apos;][j][&apos;submitterName&apos;][&apos;name_first&apos;];
+        obj.NM1data5 = msg[i][&apos;submitterInfo&apos;][j][&apos;submitterName&apos;][&apos;name_middle&apos;];
+        obj.NM1data6 = msg[i][&apos;submitterInfo&apos;][j][&apos;submitterName&apos;][&apos;IdCodeQualifier&apos;];
+        obj.NM1data7 = msg[i][&apos;submitterInfo&apos;][j][&apos;submitterName&apos;][&apos;IdCode&apos;];
+
+        obj.PERdata = msg[i][&apos;submitterInfo&apos;][j][&apos;submitterContact&apos;];
+        obj.PERdata1 = msg[i][&apos;submitterInfo&apos;][j][&apos;submitterContact&apos;][&apos;func_code&apos;];
+        obj.PERdata2 = msg[i][&apos;submitterInfo&apos;][j][&apos;submitterContact&apos;][&apos;name&apos;];
+        obj.PERdata3 = msg[i][&apos;submitterInfo&apos;][j][&apos;submitterContact&apos;][&apos;comm_qualifier&apos;];
+        obj.PERdata4 = msg[i][&apos;submitterInfo&apos;][j][&apos;submitterContact&apos;][&apos;comm_number&apos;];
+    }
+
+    /* 1000B - Parsing receiver information */
+
+    var receiverInfoLength = msg[i][&apos;receiverInfo&apos;].length;
+    for (recInfo = 0; recInfo &lt; receiverInfoLength; recInfo++) {
+        obj.EidCode = msg[i][&apos;receiverInfo&apos;][recInfo][&apos;receiverName&apos;][&apos;EidCode&apos;];
+        obj.EtypeQualifier = msg[i][&apos;receiverInfo&apos;][recInfo][&apos;receiverName&apos;][&apos;EtypeQualifier&apos;];
+        obj.orgName = msg[i][&apos;receiverInfo&apos;][recInfo][&apos;receiverName&apos;][&apos;orgName&apos;];
+        obj.IdCodeQualifier = msg[i][&apos;receiverInfo&apos;][recInfo][&apos;receiverName&apos;][&apos;IdCodeQualifier&apos;];
+        obj.IdCode = msg[i][&apos;receiverInfo&apos;][recInfo][&apos;receiverName&apos;][&apos;IdCode&apos;];
+    }
+
+    /*2000A - Parsing billing information */
+
+    var providerLength = msg[i][&apos;billingInfo&apos;].length;
+    for (billLen = 0; billLen &lt; providerLength; billLen++) {
+        obj.HLId = msg[i][&apos;billingInfo&apos;][billLen][&apos;heighrarcy_Level&apos;][&apos;IdNo&apos;];
+        obj.HLLevelcode = msg[i][&apos;billingInfo&apos;][billLen][&apos;heighrarcy_Level&apos;][&apos;levelCode&apos;];
+        obj.child_code = msg[i][&apos;billingInfo&apos;][billLen][&apos;heighrarcy_Level&apos;][&apos;childCode&apos;];
+
+        obj.pro_code = msg[i][&apos;billingInfo&apos;][billLen][&apos;providerInfo&apos;][&apos;providerCode&apos;];
+        obj.ref_ID_qualifier = msg[i][&apos;billingInfo&apos;][billLen][&apos;providerInfo&apos;][&apos;ref_id_qualifier&apos;];
+        obj.ref_ID = msg[i][&apos;billingInfo&apos;][billLen][&apos;providerInfo&apos;][&apos;ref_id&apos;];
+    }
+
+    /*2010AA - Parsing Billing Provider */
+
+    var ProLength = msg[i][&apos;billingProvider&apos;].length;
+    for (billProLen = 0; billProLen &lt; ProLength; billProLen++) {
+        obj.EidCode = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerName&apos;][&apos;EidCode&apos;];
+        obj.EtypeQualifier = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerName&apos;][&apos;EtypeQualifier&apos;];
+        obj.orgName = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerName&apos;][&apos;orgName&apos;];
+        obj.name_first = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerName&apos;][&apos;name_first&apos;];
+        obj.name_middle = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerName&apos;][&apos;name_middle&apos;];
+        obj.name_suffix = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerName&apos;][&apos;name_suffix&apos;];
+        obj.IdCodeQualifier = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerName&apos;][&apos;IdCodeQualifier&apos;];
+        obj.IdCode = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerName&apos;][&apos;IdCode&apos;];
+
+        obj.address1 = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerAddress&apos;][&apos;address_a&apos;];
+        obj.address2 = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerAddress&apos;][&apos;address_b&apos;];
+
+        obj.cityName = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerDetail&apos;][&apos;cityName&apos;];
+        obj.stateCode = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerDetail&apos;][&apos;stateCode&apos;];
+        obj.postalCode = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerDetail&apos;][&apos;postalCode&apos;];
+        obj.countryCode = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerDetail&apos;][&apos;countryCode&apos;];
+        obj.subdivisionCode = msg[i][&apos;billingProvider&apos;][billProLen][&apos;providerDetail&apos;][&apos;subdivisionCode&apos;];
+
+        obj.ref_id_qualifier = msg[i][&apos;billingProvider&apos;][billProLen][&apos;taxDetail&apos;][&apos;ref_id_qualifier&apos;];
+        obj.ref_id = msg[i][&apos;billingProvider&apos;][billProLen][&apos;taxDetail&apos;][&apos;ref_id&apos;];
+
+    }
+
+
+
+    /* Parsing subscriber Information */
+    var subsLen = msg[i][&apos;subscriberInformation&apos;].length;
+    for (subscribe = 0; subscribe &lt; subsLen; subscribe++) {
+        obj.EidCode = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberName&apos;][&apos;EidCode&apos;];
+        obj.EtypeQualifier = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberName&apos;][&apos;EtypeQualifier&apos;];
+        obj.orgName = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberName&apos;][&apos;orgName&apos;];
+        obj.name_first = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberName&apos;][&apos;name_first&apos;];
+        obj.name_middle = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberName&apos;][&apos;name_middle&apos;];
+        obj.IcQualifier = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberName&apos;][&apos;IcQualifier&apos;];
+        obj.IdCode = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberName&apos;][&apos;IdCode&apos;];
+
+        obj.address1 = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberAddress&apos;][&apos;address_a&apos;];
+        obj.address2 = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberAddress&apos;][&apos;address_b&apos;];
+
+        obj.cityName = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberDetails&apos;][&apos;cityName&apos;];
+        obj.stateCode = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberDetails&apos;][&apos;stateCode&apos;];
+        obj.postalCode = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberDetails&apos;][&apos;postalCode&apos;];
+        obj.countryCode = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberDetails&apos;][&apos;countryCode&apos;];
+        obj.subdivisionCode = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberDetails&apos;][&apos;subdivisionCode&apos;];
+
+        obj.date_time_format = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberDemographics&apos;][&apos;date_time_format&apos;];
+        obj.date_time_period = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberDemographics&apos;][&apos;date_time_period&apos;];
+        obj.genderCode = msg[i][&apos;subscriberInformation&apos;][subscribe][&apos;subscriberDemographics&apos;][&apos;genderCode&apos;];
+    }
+
+
+    /* 2010BA - Parsing payer Information */
+
+    var payerlen = msg[i][&apos;payerInformation&apos;].length;
+    for (payer = 0; payer &lt; payerlen; payer++) {
+        obj.EidCode = msg[i][&apos;payerInformation&apos;][payer][&apos;payerName&apos;][&apos;EidCode&apos;];
+        obj.EtypeQualifier = msg[i][&apos;payerInformation&apos;][payer][&apos;payerName&apos;][&apos;EtypeQualifier&apos;];
+        obj.orgName = msg[i][&apos;payerInformation&apos;][payer][&apos;payerName&apos;][&apos;orgName&apos;];
+        obj.IcQualifier = msg[i][&apos;payerInformation&apos;][payer][&apos;payerName&apos;][&apos;IdCodeQualifier&apos;];
+        obj.IdCode = msg[i][&apos;payerInformation&apos;][payer][&apos;payerName&apos;][&apos;IdCode&apos;];
+
+        obj.address1 = msg[i][&apos;payerInformation&apos;][payer][&apos;payerAddress&apos;][&apos;address_a&apos;];
+        obj.address2 = msg[i][&apos;payerInformation&apos;][payer][&apos;payerAddress&apos;][&apos;address_b&apos;];
+
+        obj.cityName = msg[i][&apos;payerInformation&apos;][payer][&apos;payerDetail&apos;][&apos;cityName&apos;];
+        obj.stateCode = msg[i][&apos;payerInformation&apos;][payer][&apos;payerDetail&apos;][&apos;stateCode&apos;];
+        obj.postalCode = msg[i][&apos;payerInformation&apos;][payer][&apos;payerDetail&apos;][&apos;postalCode&apos;];
+        obj.countryCode = msg[i][&apos;payerInformation&apos;][payer][&apos;payerDetail&apos;][&apos;countryCode&apos;];
+        obj.subdivisionCode = msg[i][&apos;payerInformation&apos;][payer][&apos;payerDetail&apos;][&apos;subdivisionCode&apos;];
+    }
+
+
+    /* 2300 - Parsing claim Information */
+
+    var claimlen = msg[i][&apos;ClaimDetails&apos;].length;
+    for (claim = 0; claim &lt; claimlen; claim++) {
+        obj.submitterId = msg[i][&apos;ClaimDetails&apos;][claim][&apos;claimInformation&apos;][&apos;submitterId&apos;];
+        obj.amount = msg[i][&apos;ClaimDetails&apos;][claim][&apos;claimInformation&apos;][&apos;amount&apos;];
+        obj.serviceLocation = msg[i][&apos;ClaimDetails&apos;][claim][&apos;claimInformation&apos;][&apos;serivceLocation&apos;];
+        obj.code_value = msg[i][&apos;ClaimDetails&apos;][claim][&apos;claimInformation&apos;][&apos;code_value&apos;];
+        obj.code_qualifier = msg[i][&apos;ClaimDetails&apos;][claim][&apos;claimInformation&apos;][&apos;code_qualifier&apos;];
+        obj.type_code = msg[i][&apos;ClaimDetails&apos;][claim][&apos;claimInformation&apos;][&apos;type_code&apos;];
+        obj.response_code = msg[i][&apos;ClaimDetails&apos;][claim][&apos;claimInformation&apos;][&apos;response_code&apos;];
+        obj.assingment_code = msg[i][&apos;ClaimDetails&apos;][claim][&apos;claimInformation&apos;][&apos;assingment_code&apos;];
+        obj.info_code = msg[i][&apos;ClaimDetails&apos;][claim][&apos;claimInformation&apos;][&apos;info_code&apos;];
+
+        obj.date_time_qual = msg[i][&apos;ClaimDetails&apos;][claim][&apos;lastSeenInformation&apos;][&apos;date_time_qual&apos;];
+        obj.format_qual = msg[i][&apos;ClaimDetails&apos;][claim][&apos;lastSeenInformation&apos;][&apos;format_qual&apos;];
+        obj.date_time_period = msg[i][&apos;ClaimDetails&apos;][claim][&apos;lastSeenInformation&apos;][&apos;date_time_period&apos;];
+
+        obj.code_information = msg[i][&apos;ClaimDetails&apos;][claim][&apos;diagnosisInformation&apos;][&apos;code_information&apos;];
+        obj.qualifier_code = msg[i][&apos;ClaimDetails&apos;][claim][&apos;diagnosisInformation&apos;][&apos;qualifier_code&apos;];
+        obj.industry_code = msg[i][&apos;ClaimDetails&apos;][claim][&apos;diagnosisInformation&apos;][&apos;industry_code&apos;];
+
+    }
+
+    //Parsing Trailer Data
+    obj.SEdata = msg[i][&apos;transactionSegment&apos;];
+    obj.SEdata1 = msg[i][&apos;transactionSegment&apos;][&apos;segment_id&apos;];
+    obj.SEdata2 = msg[i][&apos;transactionSegment&apos;][&apos;data_enroll&apos;];
+
+    obj.GEdata = msg[i][&apos;transactionSets&apos;];
+    obj.GEdata1 = msg[i][&apos;transactionSets&apos;][&apos;fg_transmission&apos;];
+    obj.GEdata2 = msg[i][&apos;transactionSets&apos;][&apos;control_number&apos;];
+
+    obj.IEAdata = msg[i][&apos;interchangeControl&apos;];
+    obj.IEAdata1 = msg[i][&apos;interchangeControl&apos;][&apos;intr_pairs&apos;];
+    obj.IEAdata2 = msg[i][&apos;interchangeControl&apos;][&apos;control_number&apos;];
+}
+
+/*constructing Header*/
+
+newXml[&apos;ISA&apos;];
+newXml[&apos;ISA&apos;][&apos;ISA.01&apos;] = obj.ISAdata1;
+newXml[&apos;ISA&apos;][&apos;ISA.02&apos;] = obj.ISAdata2;
+newXml[&apos;ISA&apos;][&apos;ISA.03&apos;] = obj.ISAdata3;
+newXml[&apos;ISA&apos;][&apos;ISA.04&apos;] = obj.ISAdata4;
+newXml[&apos;ISA&apos;][&apos;ISA.05&apos;] = obj.ISAdata5;
+newXml[&apos;ISA&apos;][&apos;ISA.06&apos;] = obj.ISAdata6;
+newXml[&apos;ISA&apos;][&apos;ISA.07&apos;] = obj.ISAdata7;
+newXml[&apos;ISA&apos;][&apos;ISA.08&apos;] = obj.ISAdata8;
+newXml[&apos;ISA&apos;][&apos;ISA.09&apos;] = obj.ISAdata9;
+
+newXml[&apos;GS&apos;];
+newXml[&apos;GS&apos;][&apos;GS.01&apos;] = obj.GSdata1;
+newXml[&apos;GS&apos;][&apos;GS.02&apos;] = obj.GSdata2;
+newXml[&apos;GS&apos;][&apos;GS.03&apos;] = obj.GSdata3;
+newXml[&apos;GS&apos;][&apos;GS.04&apos;] = obj.GSdata4;
+newXml[&apos;GS&apos;][&apos;GS.05&apos;] = obj.GSdata5;
+newXml[&apos;GS&apos;][&apos;GS.06&apos;] = obj.GSdata6;
+newXml[&apos;GS&apos;][&apos;GS.07&apos;] = obj.GSdata7;
+newXml[&apos;GS&apos;][&apos;GS.08&apos;] = obj.GSdata8;
+
+newXml[&apos;ST&apos;];
+newXml[&apos;ST&apos;][&apos;ST.01&apos;] = obj.STdata1;
+newXml[&apos;ST&apos;][&apos;ST.02&apos;] = obj.STdata2;
+newXml[&apos;ST&apos;][&apos;ST.03&apos;] = obj.STdata3;
+
+/* Constructing loop - 1000A XML */
+
+newXml[&apos;NM1&apos;];
+newXml[&apos;NM1&apos;][&apos;NM1.01&apos;] = obj.NM1data1;
+newXml[&apos;NM1&apos;][&apos;NM1.02&apos;] = obj.NM1data2;
+newXml[&apos;NM1&apos;][&apos;NM1.03&apos;] = obj.NM1data3;
+newXml[&apos;NM1&apos;][&apos;NM1.04&apos;] = obj.NM1data4;
+newXml[&apos;NM1&apos;][&apos;NM1.05&apos;] = obj.NM1data5;
+newXml[&apos;NM1&apos;][&apos;NM1.06&apos;] = obj.NM1data6;
+newXml[&apos;NM1&apos;][&apos;NM1.07&apos;] = obj.NM1data7;
+
+newXml[&apos;PER&apos;];
+newXml[&apos;PER&apos;][&apos;PER.01&apos;] = obj.PERdata1;
+newXml[&apos;PER&apos;][&apos;PER.02&apos;] = obj.PERdata2;
+newXml[&apos;PER&apos;][&apos;PER.03&apos;] = obj.PERdata3;
+newXml[&apos;PER&apos;][&apos;PER.04&apos;] = obj.PERdata4;
+
+var loop1000A = SerializerFactory.getSerializer(&apos;EDI/X12&apos;).fromXML(newXml);
+
+/* Constructing loop - 1000B XML */
+
+var recInfo = new XML(&quot;&lt;RI&gt;&lt;/RI&gt;&quot;);
+
+recInfo[&apos;NM1&apos;];
+recInfo[&apos;NM1&apos;][&apos;NM1.01&apos;] = obj.EidCode;
+recInfo[&apos;NM1&apos;][&apos;NM1.02&apos;] = obj.EtypeQualifier;
+recInfo[&apos;NM1&apos;][&apos;NM1.03&apos;] = obj.orgName;
+recInfo[&apos;NM1&apos;][&apos;NM1.08&apos;]= obj.IdCodeQualifier;
+recInfo[&apos;NM1&apos;][&apos;NM1.09&apos;] = obj.IdCode;
+
+var loop1000B = SerializerFactory.getSerializer(&apos;EDI/X12&apos;).fromXML(recInfo);
+
+/* Constructing loop - 2000A XML */
+
+
+var billInfo = new XML(&quot;&lt;BI&gt;&lt;/BI&gt;&quot;);
+
+billInfo[&apos;HL&apos;];
+billInfo[&apos;HL&apos;][&apos;HL.01&apos;] = obj.HLId;
+billInfo[&apos;HL&apos;][&apos;HL.03&apos;] = obj.HLLevelcode;
+billInfo[&apos;HL&apos;][&apos;HL.04&apos;] = obj.child_code;
+
+billInfo[&apos;PRV&apos;];
+billInfo[&apos;PRV&apos;][&apos;PRV.01&apos;] = obj.pro_code;
+billInfo[&apos;PRV&apos;][&apos;PRV.02&apos;] = obj.ref_ID_qualifier;
+billInfo[&apos;PRV&apos;][&apos;PRV.03&apos;] = obj.ref_ID;
+
+var loop2000A = SerializerFactory.getSerializer(&apos;EDI/X12&apos;).fromXML(billInfo);
+
+
+/* Constructing loop - 2010AA XML */
+
+var billproviderInfo = new XML(&quot;&lt;BP&gt;&lt;/BP&gt;&quot;);
+
+billproviderInfo[&apos;NM1&apos;];
+billproviderInfo[&apos;NM1&apos;][&apos;NM1.01&apos;] = obj.EidCode;
+billproviderInfo[&apos;NM1&apos;][&apos;NM1.02&apos;] = obj.EtypeQualifier;
+billproviderInfo[&apos;NM1&apos;][&apos;NM1.03&apos;] = obj.orgName;
+billproviderInfo[&apos;NM1&apos;][&apos;NM1.04&apos;] = obj.name_first;
+billproviderInfo[&apos;NM1&apos;][&apos;NM1.05&apos;] = obj.name_middle;
+billproviderInfo[&apos;NM1&apos;][&apos;NM1.06&apos;] = obj.name_suffix;
+billproviderInfo[&apos;NM1&apos;][&apos;NM1.07&apos;] = obj.IdCodeQualifier;
+billproviderInfo[&apos;NM1&apos;][&apos;NM1.08&apos;] = obj.IdCode;
+
+
+billproviderInfo[&apos;N3&apos;];
+billproviderInfo[&apos;N3&apos;][&apos;N3.01&apos;] = obj.address1;
+billproviderInfo[&apos;N3&apos;][&apos;N3.02&apos;] = obj.address2;
+
+
+billproviderInfo[&apos;N4&apos;];
+billproviderInfo[&apos;N4&apos;][&apos;N4.01&apos;] = obj.cityName;
+billproviderInfo[&apos;N4&apos;][&apos;N4.02&apos;] = obj.stateCode;
+billproviderInfo[&apos;N4&apos;][&apos;N4.03&apos;] = obj.postalCode;
+billproviderInfo[&apos;N4&apos;][&apos;N4.04&apos;] = obj.countryCode;
+billproviderInfo[&apos;N4&apos;][&apos;N4.07&apos;] = obj.subdivisionCode;
+
+billproviderInfo[&apos;REF&apos;];
+billproviderInfo[&apos;REF&apos;][&apos;REF.01&apos;] = obj.ref_id_qualifier;
+billproviderInfo[&apos;REF&apos;][&apos;REF.02&apos;] = obj.ref_id;
+
+
+var loop2010AA = SerializerFactory.getSerializer(&apos;EDI/X12&apos;).fromXML(billproviderInfo);
+
+
+/* Constructing loop - 2010BA XML */
+
+
+var subsInfo = new XML(&quot;&lt;SI&gt;&lt;/SI&gt;&quot;);
+
+subsInfo[&apos;NM1&apos;]
+subsInfo[&apos;NM1&apos;][&apos;NM1.01&apos;] = obj.EidCode;
+subsInfo[&apos;NM1&apos;][&apos;NM1.02&apos;] = obj.EtypeQualifier;
+subsInfo[&apos;NM1&apos;][&apos;NM1.03&apos;] = obj.orgName;
+subsInfo[&apos;NM1&apos;][&apos;NM1.08&apos;] = obj.IcQualifier;
+subsInfo[&apos;NM1&apos;][&apos;NM1.09&apos;] = obj.IdCode;
+
+subsInfo[&apos;N3&apos;];
+subsInfo[&apos;N3&apos;][&apos;N3.01&apos;] = obj.address1;
+subsInfo[&apos;N3&apos;][&apos;N3.02&apos;] = obj.address2;
+
+subsInfo[&apos;N4&apos;];
+subsInfo[&apos;N4&apos;][&apos;N4.01&apos;] = obj.cityName;
+subsInfo[&apos;N4&apos;][&apos;N4.02&apos;] = obj.stateCode;
+subsInfo[&apos;N4&apos;][&apos;N4.03&apos;] = obj.postalCode;
+subsInfo[&apos;N4&apos;][&apos;N4.04&apos;] = obj.countryCode;
+subsInfo[&apos;N4&apos;][&apos;N4.07&apos;] = obj.subdivisionCode;
+
+subsInfo[&apos;REF&apos;];
+subsInfo[&apos;REF&apos;][&apos;REF.01&apos;] = obj.date_time_format;
+subsInfo[&apos;REF&apos;][&apos;REF.02&apos;] = obj.date_time_period;
+subsInfo[&apos;REF&apos;][&apos;REF.03&apos;] = obj.genderCode;
+
+var loop2010BA = SerializerFactory.getSerializer(&apos;EDI/X12&apos;).fromXML(subsInfo);
+
+/* Constructing loop - 2010BB XML */
+
+var payerInfo = new XML(&quot;&lt;PI&gt;&lt;/PI&gt;&quot;);
+
+payerInfo[&apos;NM1&apos;];
+payerInfo[&apos;NM1&apos;][&apos;NM1.01&apos;] = obj.EidCode;
+payerInfo[&apos;NM1&apos;][&apos;NM1.02&apos;] = obj.EtypeQualifier;
+payerInfo[&apos;NM1&apos;][&apos;NM1.03&apos;] = obj.orgName;
+payerInfo[&apos;NM1&apos;][&apos;NM1.08&apos;] = obj.IcQualifier;
+payerInfo[&apos;NM1&apos;][&apos;NM1.09&apos;] = obj.IdCode;
+
+payerInfo[&apos;N3&apos;];
+payerInfo[&apos;N3&apos;][&apos;N3.01&apos;] = obj.address1;
+payerInfo[&apos;N3&apos;][&apos;N3.02&apos;] = obj.address2;
+
+payerInfo[&apos;N4&apos;];
+payerInfo[&apos;N4&apos;][&apos;N4.01&apos;] = obj.cityName;
+payerInfo[&apos;N4&apos;][&apos;N4.02&apos;] = obj.stateCode;
+payerInfo[&apos;N4&apos;][&apos;N4.03&apos;] = obj.postalCode;
+payerInfo[&apos;N4&apos;][&apos;N4.04&apos;] = obj.countryCode;
+payerInfo[&apos;N4&apos;][&apos;N4.07&apos;] = obj.subdivisionCode;
+
+var loop2010BB = SerializerFactory.getSerializer(&apos;EDI/X12&apos;).fromXML(payerInfo);
+
+/* Constructing loop 2300  */
+
+var claimInfo = new XML(&quot;&lt;CI&gt;&lt;/CI&gt;&quot;);
+
+claimInfo[&apos;CLM&apos;];
+claimInfo[&apos;CLM&apos;][&apos;CLM.01&apos;] = obj.submitterId;
+claimInfo[&apos;CLM&apos;][&apos;CLM.02&apos;] = obj.amount;
+claimInfo[&apos;CLM&apos;][&apos;CLM.05&apos;] = obj.serviceLocation;
+claimInfo[&apos;CLM&apos;][&apos;CLM.05-1&apos;] = obj.code_value;
+claimInfo[&apos;CLM&apos;][&apos;CLM.05-2&apos;] = obj.code_qualifier;
+claimInfo[&apos;CLM&apos;][&apos;CLM.05-3&apos;] = obj.type_code;
+claimInfo[&apos;CLM&apos;][&apos;CLM.06&apos;] = obj.response_code;
+claimInfo[&apos;CLM&apos;][&apos;CLM.07&apos;] = obj.assingment_code;
+claimInfo[&apos;CLM&apos;][&apos;CLM.08&apos;] = obj.response_code;
+claimInfo[&apos;CLM&apos;][&apos;CLM.09&apos;] = obj.info_code;
+
+claimInfo[&apos;DTP&apos;];
+claimInfo[&apos;DTP&apos;][&apos;DTP.01&apos;] = obj.date_time_qual;
+claimInfo[&apos;DTP&apos;][&apos;DTP.02&apos;] = obj.format_qual;
+claimInfo[&apos;DTP&apos;][&apos;DTP.03&apos;] = obj.date_time_period;
+
+claimInfo[&apos;HI&apos;];
+claimInfo[&apos;HI.01&apos;] = obj.code_information;
+claimInfo[&apos;HI.02&apos;] = obj.qualifier_code;
+claimInfo[&apos;HI.03&apos;] = obj.industry_code;
+
+var loop2300 = SerializerFactory.getSerializer(&apos;EDI/X12&apos;).fromXML(claimInfo);
+
+
+//Constructing Trailer segments
+var TrailData = new XML(&quot;&lt;SE&gt;&lt;/SE&gt;&quot;);
+TrailData[&apos;SE&apos;];
+TrailData[&apos;SE&apos;][&apos;SE.01&apos;] = obj.SEdata1;
+TrailData[&apos;SE&apos;][&apos;SE.02&apos;] = obj.SEdata2;
+
+TrailData[&apos;GE&apos;];
+TrailData[&apos;GE&apos;][&apos;GE.01&apos;] = obj.GEdata1;
+TrailData[&apos;GE&apos;][&apos;GE.02&apos;] = obj.GEdata2;
+
+TrailData[&apos;IEA&apos;];
+TrailData[&apos;IEA&apos;][&apos;IEA.01&apos;] = obj.IEAdata1;
+TrailData[&apos;IEA&apos;][&apos;IEA.02&apos;] = obj.IEAdata2;
+
+var loop2440 = SerializerFactory.getSerializer(&apos;EDI/X12&apos;).fromXML(TrailData);
+
+
+/* Consolidating Loops */
+
+var data = loop1000A + loop1000B + loop2000A + loop2010AA + loop2010BA + loop2010BB + loop2300 + loop2440;
+
+/* Generating ChannelVariable for access */
+
+channelMap.put(&apos;serialize&apos;, data);
+
+/* Printing EDI Message in console */
+
+logger.info(&quot;EDI message : &quot; + data);</string>
+            </entry>
+          </data>
+        </step>
+      </steps>
+      <inboundTemplate encoding="base64">W3sKCSJjb250cm9sSGVhZGVyIjogewoJCSJhdXRoUXVhbGlmaWVyIjogIjAwIiwKCQkicXV0aElu
+Zm8iOiAiIiwKCQkic2VjUXVsYWlmaWVyIjogIjAwIiwKCQkic2VjSW5mbyI6ICIiLAoJCSJJY1F1
+YWxpZmllciI6ICJ6eiIsCgkJIkljU2VuZGVySWQiOiAiSENTQ0xBQk9SIiwKCQkiSWNSZWNlaXZl
+cklkIjogIiIsCgkJIkljRGF0ZSI6ICIiLAoJCSJJY0NWZXJzaW9uIjogIjAwNTAxIgoJfSwKCSJm
+dW5jdGlvbmFsSGVhZGVyIjogewoJCSJmdW5jX2lkX2NvZGUiOiAiSEMiLAoJCSJhcHBfc2VuZF9j
+b2RlIjogIjk5OTk5OTk5OTkiLAoJCSJhcHBfcmVjX2NvZGUiOiAiODg4ODg4ODg4OCIsCgkJImRh
+dGUiOiAiMjAxMTEyMTkiLAoJCSJ0aW1lIjogIjEzNDAiLAoJCSJncnBfY3RybF9ubyI6ICIxMzc3
+IiwKCQkiQWdDb2RlIjogIlgiLAoJCSJJaUNvZGUiOiAiMDA1MDEwWDIyMkExIgoJfSwKCSJ0cmFu
+c2FjdGlvbkhlYWRlciI6IHsKCQkidHNfaWRfY29kZSI6ICI4MzciLAoJCSJ0c19jdHJsX25vIjog
+IjAwMDEiLAoJCSJpbXBsX2NvbnZfcmVmIjogIjAwNTAxMFgyMjIiCgl9LAoJInN1Ym1pdHRlcklu
+Zm8iOiBbewoJCSJzdWJtaXR0ZXJOYW1lIjogewoJCQkiRWlkQ29kZSI6ICI0MSIsCgkJCSJFdHlw
+ZVF1YWxpZmllciI6ICIyIiwKCQkJIm9yZ05hbWUiOiAiU0FNUExFIElOQyIsCgkJCSJuYW1lX2Zp
+cnN0IjogIiIsCgkJCSJuYW1lX21pZGRsZSI6ICIiLAoJCQkiSWRDb2RlUXVhbGlmaWVyIjogIjQ2
+IiwKCQkJIklkQ29kZSI6ICI0OTYxMDMiCgkJfSwKCQkic3VibWl0dGVyQ29udGFjdCI6IHsKCQkJ
+ImZ1bmNfY29kZSI6ICJJQyIsCgkJCSJuYW1lIjogIktFVklOIiwKCQkJImNvbW1fcXVhbGlmaWVy
+IjogIlRFIiwKCQkJImNvbW1fbnVtYmVyIjogIjQxMjQ1NDEwMDAiCgkJfQoJfV0sCgoJInJlY2Vp
+dmVySW5mbyI6IFt7CgkJInJlY2VpdmVyTmFtZSI6IHsKCQkJIkVpZENvZGUiOiAiNDAiLAoJCQki
+RXR5cGVRdWFsaWZpZXIiOiAiMiIsCgkJCSJvcmdOYW1lIjogIlVQTUMiLAoJCQkibmFtZV9maXJz
+dCI6ICIiLAoJCQkibmFtZV9taWRkbGUiOiAiIiwKCQkJIklkQ29kZVF1YWxpZmllciI6ICI0NiIs
+CgkJCSJJZENvZGUiOiAiNzMwNjg0OTU0OSIKCQl9Cgl9XSwKCgkiYmlsbGluZ0luZm8iOiBbewoJ
+CSJoZWlnaHJhcmN5X0xldmVsIjogewoJCQkiSWRObyI6ICIxIiwKCQkJImxldmVsQ29kZSI6ICIy
+MCIsCgkJCSJjaGlsZENvZGUiOiAiMSIKCQl9LAoJCSJwcm92aWRlckluZm8iOiB7CgkJCSJwcm92
+aWRlckNvZGUiOiAiQkkiLAoJCQkicmVmX2lkX3F1YWxpZmllciI6ICJaWiIsCgkJCSJyZWZfaWQi
+OiAiMjA4MDAwMDAwWCIKCQl9Cgl9XSwKCgkiYmlsbGluZ1Byb3ZpZGVyIjogW3sKCQkicHJvdmlk
+ZXJOYW1lIjogewoJCQkiRWlkQ29kZSI6ICI4NSIsCgkJCSJFdHlwZVF1YWxpZmllciI6ICIxIiwK
+CQkJIm9yZ05hbWUiOiAiTElORSIsCgkJCSJuYW1lX2ZpcnN0IjogIldJTExJQU0iLAoJCQkibmFt
+ZV9taWRkbGUiOiAiSiIsCgkJCSJuYW1lX3N1ZmZpeCI6ICIiLAoJCQkiSWRDb2RlUXVhbGlmaWVy
+IjogIlhYIiwKCQkJIklkQ29kZSI6ICIwMTAxMDEwMSIKCQl9LAoJCSJwcm92aWRlckFkZHJlc3Mi
+OiB7CgkJCSJhZGRyZXNzX2EiOiAiMTIzIFBFUFBFUiBTVCIsCgkJCSJhZGRyZXNzX2IiOiAiIgoJ
+CX0sCgkJInByb3ZpZGVyRGV0YWlsIjogewoJCQkiY2l0eU5hbWUiOiAiUElUVFNCVVJHSCIsCgkJ
+CSJzdGF0ZUNvZGUiOiAiUEEiLAoJCQkicG9zdGFsQ29kZSI6ICIxNTEyMyIsCgkJCSJjb3VudHJ5
+Q29kZSI6ICIiLAoJCQkic3ViZGl2aXNpb25Db2RlIjogIiIKCQl9LAoJCSJ0YXhEZXRhaWwiOiB7
+CgkJCSJyZWZfaWRfcXVhbGlmaWVyIjogIkVJIiwKCQkJInJlZl9pZCI6ICIyNjAxMTAyMjIiCgkJ
+fQoKCX1dLAoJInN1YnNjcmliZXJJbmZvcm1hdGlvbiI6W3sKCQkic3Vic2NyaWJlck5hbWUiOnsK
+CQkJIkVpZENvZGUiOiJJTCIsCgkJCSJFdHlwZVF1YWxpZmllciI6IjEiLAoJCQkib3JnTmFtZSI6
+IktFTlQiLAoJCQkibmFtZV9maXJzdCI6IkNMQVJLIiwKCQkJIm5hbWVfbWlkZGxlIjoiUyIsCgkJ
+CSJJY1F1YWxpZmllciI6Ik1JIiwKCQkJIklkQ29kZSI6IjAwMDAwMDAwMTAxIgoJCX0sCgkJInN1
+YnNjcmliZXJBZGRyZXNzIjp7CgkJCSJhZGRyZXNzX2EiOiIxMjMgRkFLRSBTVFJFRVQiLAoJCQki
+YWRkcmVzc19iIjoiIgoJCX0sCgkJInN1YnNjcmliZXJEZXRhaWxzIjp7CgkJCSJjaXR5TmFtZSI6
+IlBJVFRTQlVSR0giLAoJCQkic3RhdGVDb2RlIjoiUEEiLAoJCQkicG9zdGFsQ29kZSI6IjE1MTIz
+IiwKCQkJImNvdW50cnlDb2RlIjoiIiwKCQkJInN1YmRpdmlzaW9uQ29kZSI6IiIKCQl9LAoJCSJz
+dWJzY3JpYmVyRGVtb2dyYXBoaWNzIjp7CgkJCSJkYXRlX3RpbWVfZm9ybWF0IjoiRDgiLAoJCQki
+ZGF0ZV90aW1lX3BlcmlvZCI6IjIwMDYwNTAzIiwKCQkJImdlbmRlckNvZGUiOiJNIgoJCX0KCX1d
+LAogICAgICAicGF5ZXJJbmZvcm1hdGlvbiI6W3sKCQkgICJwYXllck5hbWUiOnsKCQkgICJFaWRD
+b2RlIjoiUFIiLAoJCSAgIkV0eXBlUXVhbGlmaWVyIjoiMiIsCgkJICAib3JnTmFtZSI6IlVQTUMg
+SEVBTFRIIFBMQU4iLAoJCSAgIklkQ29kZVF1YWxpZmllciI6IlBJIiwKCQkgICJJZENvZGUiOiI3
+MzA2ODQ5NTQ5IgoJCSAgfSwKCQkgICJwYXllckFkZHJlc3MiOnsKCQkJICAiYWRkcmVzc19hIjoi
+MSBDSEFUSEFNIENFTlRFUiAxMTIgV0FTSElOR1RPTiIsCgkJCSAgImFkZHJlc3NfYiI6IlBPIEJP
+WCAyOTk1IgoJCSAgfSwKCQkgICJwYXllckRldGFpbCI6ewoJCQkgICJjaXR5TmFtZSI6IlBJVFRT
+QlVSR0giLAoJCQkgICJzdGF0ZUNvZGUiOiJQQSIsCgkJCSAgInBvc3RhbENvZGUiOiIxNTIzMCIs
+CgkJCSAgImNvdW50cnlDb2RlIjoiIiwKCQkJICAic3ViZGl2aXNpb25Db2RlIjoiIgoJCSAgfQoJ
+ICB9XSwKCSAgIkNsYWltRGV0YWlscyI6W3sKCQkgImNsYWltSW5mb3JtYXRpb24iOnsKCQkJICJz
+dWJtaXR0ZXJJZCI6IjIxNTI0MTQ5MDI2MDAzMTIiLAoJCQkgImFtb3VudCI6IjQ3LjI4IiwKCQkJ
+ICJzZXJpdmNlTG9jYXRpb24iOiIxMSIsCgkJCSAiY29kZV92YWx1ZSI6IiIsCgkJCSAiY29kZV9x
+dWFsaWZpZXIiOiIxIiwKCQkJICJ0eXBlX2NvZGUiOiJZIiwKCQkJICJyZXNwb25zZV9jb2RlIjoi
+QSIsCgkJCSAiYXNzaW5nbWVudF9jb2RlIjoiWSIsCgkJCSAicmVzcG9uc2VfY29kZSI6IlkiLAoJ
+CQkgImluZm9fY29kZSI6IkIiCgkJIH0sCiAgICAgICAgImxhc3RTZWVuSW5mb3JtYXRpb24iOnsK
+CQkJImRhdGVfdGltZV9xdWFsIjoiMzA0IiwKCQkJImZvcm1hdF9xdWFsIjoiRDgiLAoJCQkiZGF0
+ZV90aW1lX3BlcmlvZCI6IjIwMTEwNDA1IgoJCX0sCiAgICAgICAgImRpYWdub3Npc0luZm9ybWF0
+aW9uIjp7CgkJCSJjb2RlX2luZm9ybWF0aW9uIjoiQks6VjA1MyIsCgkJCSJxdWFsaWZpZXJfY29k
+ZSI6IkJGOlYwNjgiLAoJCQkiaW5kdXN0cnlfY29kZSI6IkJGOlYwMzgyIgoJCX0JCQoJICB9XSwK
+CSJ0cmFuc2FjdGlvblNlZ21lbnQiOiB7CgkJInNlZ21lbnRfaWQiOiAiNDEiLAoJCSJkYXRhX2Vu
+cm9sbCI6ICIwMDAxIgoJfSwKCSJ0cmFuc2FjdGlvblNldHMiOiB7CgkJImZnX3RyYW5zbWlzc2lv
+biI6ICIxIiwKCQkiY29udHJvbF9udW1iZXIiOiAiMzEyIgoJfSwKCSJpbnRlcmNoYW5nZUNvbnRy
+b2wiOiB7CgkJImludHJfcGFpcnMiOiAiMSIsCgkJImNvbnRyb2xfbnVtYmVyIjogIjAwMDAwMDMx
+MiIKCX0KfV0=</inboundTemplate>
+      <outboundTemplate encoding="base64"></outboundTemplate>
+      <inboundDataType>JSON</inboundDataType>
+      <outboundDataType>RAW</outboundDataType>
+      <inboundProperties class="com.mirth.connect.plugins.datatypes.json.JSONDataTypeProperties" version="3.3.1">
+        <batchProperties class="com.mirth.connect.plugins.datatypes.json.JSONBatchProperties" version="3.3.1">
+          <batchScript></batchScript>
+        </batchProperties>
+      </inboundProperties>
+      <outboundProperties class="com.mirth.connect.plugins.datatypes.raw.RawDataTypeProperties" version="3.3.1">
+        <batchProperties class="com.mirth.connect.plugins.datatypes.raw.RawBatchProperties" version="3.3.1">
+          <splitType>JavaScript</splitType>
+          <batchScript></batchScript>
+        </batchProperties>
+      </outboundProperties>
+    </transformer>
+    <filter version="3.3.1">
+      <rules/>
+    </filter>
+    <transportName>File Reader</transportName>
+    <mode>SOURCE</mode>
+    <enabled>true</enabled>
+    <waitForPrevious>true</waitForPrevious>
+  </sourceConnector>
+  <destinationConnectors>
+    <connector version="3.3.1">
+      <metaDataId>1</metaDataId>
+      <name>Destination 1</name>
+      <properties class="com.mirth.connect.connectors.file.FileDispatcherProperties" version="3.3.1">
+        <pluginProperties/>
+        <destinationConnectorProperties version="3.3.1">
+          <queueEnabled>false</queueEnabled>
+          <sendFirst>false</sendFirst>
+          <retryIntervalMillis>10000</retryIntervalMillis>
+          <regenerateTemplate>false</regenerateTemplate>
+          <retryCount>0</retryCount>
+          <rotate>false</rotate>
+          <includeFilterTransformer>false</includeFilterTransformer>
+          <threadCount>1</threadCount>
+          <threadAssignmentVariable></threadAssignmentVariable>
+          <validateResponse>false</validateResponse>
+          <resourceIds class="singleton-set">
+            <string>Default Resource</string>
+          </resourceIds>
+        </destinationConnectorProperties>
+        <scheme>FILE</scheme>
+        <host>D:/EDIX12/Mirthoutput</host>
+        <outputPattern>output.txt</outputPattern>
+        <anonymous>true</anonymous>
+        <username>anonymous</username>
+        <password>anonymous</password>
+        <timeout>10000</timeout>
+        <secure>true</secure>
+        <passive>true</passive>
+        <validateConnection>true</validateConnection>
+        <outputAppend>true</outputAppend>
+        <errorOnExists>false</errorOnExists>
+        <temporary>false</temporary>
+        <binary>false</binary>
+        <charsetEncoding>DEFAULT_ENCODING</charsetEncoding>
+        <template>${serialize}</template>
+      </properties>
+      <transformer version="3.3.1">
+        <steps/>
+        <inboundDataType>RAW</inboundDataType>
+        <outboundDataType>RAW</outboundDataType>
+        <inboundProperties class="com.mirth.connect.plugins.datatypes.raw.RawDataTypeProperties" version="3.3.1">
+          <batchProperties class="com.mirth.connect.plugins.datatypes.raw.RawBatchProperties" version="3.3.1">
+            <splitType>JavaScript</splitType>
+            <batchScript></batchScript>
+          </batchProperties>
+        </inboundProperties>
+        <outboundProperties class="com.mirth.connect.plugins.datatypes.raw.RawDataTypeProperties" version="3.3.1">
+          <batchProperties class="com.mirth.connect.plugins.datatypes.raw.RawBatchProperties" version="3.3.1">
+            <splitType>JavaScript</splitType>
+            <batchScript></batchScript>
+          </batchProperties>
+        </outboundProperties>
+      </transformer>
+      <responseTransformer version="3.3.1">
+        <steps/>
+        <inboundDataType>RAW</inboundDataType>
+        <outboundDataType>RAW</outboundDataType>
+        <inboundProperties class="com.mirth.connect.plugins.datatypes.raw.RawDataTypeProperties" version="3.3.1">
+          <batchProperties class="com.mirth.connect.plugins.datatypes.raw.RawBatchProperties" version="3.3.1">
+            <splitType>JavaScript</splitType>
+            <batchScript></batchScript>
+          </batchProperties>
+        </inboundProperties>
+        <outboundProperties class="com.mirth.connect.plugins.datatypes.raw.RawDataTypeProperties" version="3.3.1">
+          <batchProperties class="com.mirth.connect.plugins.datatypes.raw.RawBatchProperties" version="3.3.1">
+            <splitType>JavaScript</splitType>
+            <batchScript></batchScript>
+          </batchProperties>
+        </outboundProperties>
+      </responseTransformer>
+      <filter version="3.3.1">
+        <rules/>
+      </filter>
+      <transportName>File Writer</transportName>
+      <mode>DESTINATION</mode>
+      <enabled>true</enabled>
+      <waitForPrevious>true</waitForPrevious>
+    </connector>
+  </destinationConnectors>
+  <preprocessingScript>// Modify the message variable below to pre process data
+return message;</preprocessingScript>
+  <postprocessingScript>// This script executes once after a message has been processed
+// Responses returned from here will be stored as &quot;Postprocessor&quot; in the response map
+return;</postprocessingScript>
+  <deployScript>// This script executes once when the channel is deployed
+// You only have access to the globalMap and globalChannelMap here to persist data
+// This script executes once when the channel is deployed
+// You only have access to the globalMap and globalChannelMap here to persist data
+</deployScript>
+  <undeployScript>// This script executes once when the channel is undeployed
+// You only have access to the globalMap and globalChannelMap here to persist data
+return;</undeployScript>
+  <properties version="3.3.1">
+    <clearGlobalChannelMap>true</clearGlobalChannelMap>
+    <messageStorageMode>DEVELOPMENT</messageStorageMode>
+    <encryptData>false</encryptData>
+    <removeContentOnCompletion>false</removeContentOnCompletion>
+    <removeOnlyFilteredOnCompletion>false</removeOnlyFilteredOnCompletion>
+    <removeAttachmentsOnCompletion>false</removeAttachmentsOnCompletion>
+    <initialState>STARTED</initialState>
+    <storeAttachments>true</storeAttachments>
+    <tags class="linked-hash-set"/>
+    <metaDataColumns>
+      <metaDataColumn>
+        <name>SOURCE</name>
+        <type>STRING</type>
+        <mappingName>mirth_source</mappingName>
+      </metaDataColumn>
+      <metaDataColumn>
+        <name>TYPE</name>
+        <type>STRING</type>
+        <mappingName>mirth_type</mappingName>
+      </metaDataColumn>
+    </metaDataColumns>
+    <attachmentProperties>
+      <className>com.mirth.connect.server.attachments.JavaScriptAttachmentHandler</className>
+      <type>JavaScript</type>
+      <properties>
+        <entry>
+          <string>javascript.script</string>
+          <string>// Modify the message variable below to create attachments
+return message;</string>
+        </entry>
+      </properties>
+    </attachmentProperties>
+    <archiveEnabled>true</archiveEnabled>
+    <resourceIds class="linked-hash-set">
+      <string>Default Resource</string>
+    </resourceIds>
+  </properties>
+  <codeTemplateLibraries>
+    <codeTemplateLibrary version="3.3.1">
+      <id>dbdf9cc6-fa5a-4b25-8f94-f03bdf1a32c5</id>
+      <name>Library 1</name>
+      <revision>2</revision>
+      <lastModified>
+        <time>1445262112581</time>
+        <timezone>Asia/Calcutta</timezone>
+      </lastModified>
+      <description>This library was added upon migration to version 3.3.0. It includes all pre-existing
+code templates, and is set to be included on all pre-existing and new channels.
+
+You should create your own new libraries and assign code templates to them as you
+see fit. You should also link libraries to specific channels, so that you&apos;re not
+necessarily including all code templates on all channels all the time.</description>
+      <includeNewChannels>true</includeNewChannels>
+      <enabledChannelIds>
+        <string>7581d4ad-2720-4a2c-9ba0-aac06fb30e9f</string>
+      </enabledChannelIds>
+      <disabledChannelIds/>
+      <codeTemplates/>
+    </codeTemplateLibrary>
+  </codeTemplateLibraries>
+</channel>
