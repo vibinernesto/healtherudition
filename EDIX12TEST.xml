@@ -1,0 +1,389 @@
+<channel version="3.3.1">
+  <id>1e0b1483-ccb2-4fbc-8fac-d88ddb3ab626</id>
+  <nextMetaDataId>2</nextMetaDataId>
+  <name>EDIX12 TEST</name>
+  <description></description>
+  <enabled>true</enabled>
+  <lastModified>
+    <time>1462987102909</time>
+    <timezone>Asia/Calcutta</timezone>
+  </lastModified>
+  <revision>500</revision>
+  <sourceConnector version="3.3.1">
+    <metaDataId>0</metaDataId>
+    <name>sourceConnector</name>
+    <properties class="com.mirth.connect.connectors.file.FileReceiverProperties" version="3.3.1">
+      <pluginProperties/>
+      <pollConnectorProperties version="3.3.1">
+        <pollingType>INTERVAL</pollingType>
+        <pollOnStart>true</pollOnStart>
+        <pollingFrequency>60000</pollingFrequency>
+        <pollingHour>0</pollingHour>
+        <pollingMinute>0</pollingMinute>
+        <cronJobs/>
+        <pollConnectorPropertiesAdvanced>
+          <weekly>true</weekly>
+          <inactiveDays>
+            <boolean>false</boolean>
+            <boolean>false</boolean>
+            <boolean>false</boolean>
+            <boolean>false</boolean>
+            <boolean>false</boolean>
+            <boolean>false</boolean>
+            <boolean>false</boolean>
+            <boolean>false</boolean>
+          </inactiveDays>
+          <dayOfMonth>1</dayOfMonth>
+          <allDay>true</allDay>
+          <startingHour>8</startingHour>
+          <startingMinute>0</startingMinute>
+          <endingHour>17</endingHour>
+          <endingMinute>0</endingMinute>
+        </pollConnectorPropertiesAdvanced>
+      </pollConnectorProperties>
+      <sourceConnectorProperties version="3.3.1">
+        <responseVariable>None</responseVariable>
+        <respondAfterProcessing>true</respondAfterProcessing>
+        <processBatch>false</processBatch>
+        <firstResponse>false</firstResponse>
+        <resourceIds class="singleton-set">
+          <string>Default Resource</string>
+        </resourceIds>
+      </sourceConnectorProperties>
+      <scheme>FILE</scheme>
+      <host>D:/EDIX12/</host>
+      <fileFilter>*.json</fileFilter>
+      <regex>false</regex>
+      <directoryRecursion>false</directoryRecursion>
+      <ignoreDot>true</ignoreDot>
+      <anonymous>true</anonymous>
+      <username>anonymous</username>
+      <password>anonymous</password>
+      <timeout>10000</timeout>
+      <secure>true</secure>
+      <passive>true</passive>
+      <validateConnection>true</validateConnection>
+      <afterProcessingAction>NONE</afterProcessingAction>
+      <moveToDirectory></moveToDirectory>
+      <moveToFileName></moveToFileName>
+      <errorReadingAction>NONE</errorReadingAction>
+      <errorResponseAction>AFTER_PROCESSING</errorResponseAction>
+      <errorMoveToDirectory></errorMoveToDirectory>
+      <errorMoveToFileName></errorMoveToFileName>
+      <checkFileAge>true</checkFileAge>
+      <fileAge>1000</fileAge>
+      <fileSizeMinimum>0</fileSizeMinimum>
+      <fileSizeMaximum></fileSizeMaximum>
+      <ignoreFileSizeMaximum>true</ignoreFileSizeMaximum>
+      <sortBy>date</sortBy>
+      <binary>false</binary>
+      <charsetEncoding>DEFAULT_ENCODING</charsetEncoding>
+    </properties>
+    <transformer version="3.3.1">
+      <steps>
+        <step>
+          <sequenceNumber>0</sequenceNumber>
+          <name>ReadIncomingEDIX12</name>
+          <script>//Fetch Incomming Data
+var x = connectorMessage.getRawData();
+//Set variables
+var msgLength = msg.length;
+var objArray =[];
+var obj={}
+//Looping the JSON structure
+for(i=0;i&lt;msgLength;i++)
+{
+obj.ISAdata=msg[i][&apos;ISA&apos;];
+obj.ISAdata1=msg[i][&apos;ISA&apos;][&apos;ISA.01&apos;];
+obj.ISAdata2=msg[i][&apos;ISA&apos;][&apos;ISA.02&apos;];
+obj.ISAdata3=msg[i][&apos;ISA&apos;][&apos;ISA.03&apos;];
+obj.ISAdata4=msg[i][&apos;ISA&apos;][&apos;ISA.04&apos;];
+obj.ISAdata5=msg[i][&apos;ISA&apos;][&apos;ISA.05&apos;];
+obj.ISAdata6=msg[i][&apos;ISA&apos;][&apos;ISA.06&apos;];
+obj.GSdata=msg[i][&apos;GS&apos;];
+obj.GSdata1=msg[i][&apos;GS&apos;][&apos;GS.01&apos;];
+obj.GSdata2=msg[i][&apos;GS&apos;][&apos;GS.02&apos;];
+obj.GSdata3=msg[i][&apos;GS&apos;][&apos;GS.03&apos;];
+obj.GSdata4=msg[i][&apos;GS&apos;][&apos;GS.04&apos;];
+obj.GSdata5=msg[i][&apos;GS&apos;][&apos;GS.05&apos;];
+obj.GSdata6=msg[i][&apos;GS&apos;][&apos;GS.06&apos;];
+obj.STdata=msg[i][&apos;ST&apos;];
+obj.STdata1=msg[i][&apos;ST&apos;][&apos;ST.01&apos;];
+obj.STdata2=msg[i][&apos;ST&apos;][&apos;ST.02&apos;];
+obj.STdata3=msg[i][&apos;ST&apos;][&apos;ST.03&apos;];
+objArray.push(obj);
+}
+//Constructing XML from looped JSON
+var newXml = new XML(&quot;&lt;EDI&gt;&lt;/EDI&gt;&quot;);
+newXml[&apos;ISA&apos;];
+newXml[&apos;ISA&apos;][&apos;ISA.01&apos;]=obj.ISAdata1;
+newXml[&apos;ISA&apos;][&apos;ISA.02&apos;]=obj.ISAdata2;
+newXml[&apos;ISA&apos;][&apos;ISA.03&apos;]=obj.ISAdata3;
+newXml[&apos;ISA&apos;][&apos;ISA.04&apos;]=obj.ISAdata4;
+newXml[&apos;ISA&apos;][&apos;ISA.05&apos;]=obj.ISAdata5;
+newXml[&apos;ISA&apos;][&apos;ISA.06&apos;]=obj.ISAdata6;
+newXml[&apos;GS&apos;];
+newXml[&apos;GS&apos;][&apos;GS.01&apos;]=obj.GSdata1;
+newXml[&apos;GS&apos;][&apos;GS.02&apos;]=obj.GSdata2;
+newXml[&apos;GS&apos;][&apos;GS.03&apos;]=obj.GSdata3;
+newXml[&apos;GS&apos;][&apos;GS.04&apos;]=obj.GSdata4;
+newXml[&apos;GS&apos;][&apos;GS.05&apos;]=obj.GSdata5;
+newXml[&apos;GS&apos;][&apos;GS.06&apos;]=obj.GSdata6;
+newXml[&apos;ST&apos;]
+newXml[&apos;ST&apos;][&apos;ST.01&apos;]=obj.STdata1;
+newXml[&apos;ST&apos;][&apos;ST.02&apos;]=obj.STdata2;
+newXml[&apos;ST&apos;][&apos;ST.03&apos;]=obj.STdata3;
+logger.info(&quot;XML : &quot;+newXml);
+//Convert XML to EDI/X12 837 message
+var q = SerializerFactory.getSerializer(&apos;EDI/X12&apos;).fromXML(newXml);
+channelMap.put(&apos;serialize&apos;,q);//provide global channelMap access
+//log Output
+logger.info(&quot;EDI message : &quot;+q);</script>
+          <type>JavaScript</type>
+          <data>
+            <entry>
+              <string>Script</string>
+              <string>//Fetch Incomming Data
+var x = connectorMessage.getRawData();
+//Set variables
+var msgLength = msg.length;
+var objArray =[];
+var obj={}
+//Looping the JSON structure
+for(i=0;i&lt;msgLength;i++)
+{
+obj.ISAdata=msg[i][&apos;ISA&apos;];
+obj.ISAdata1=msg[i][&apos;ISA&apos;][&apos;ISA.01&apos;];
+obj.ISAdata2=msg[i][&apos;ISA&apos;][&apos;ISA.02&apos;];
+obj.ISAdata3=msg[i][&apos;ISA&apos;][&apos;ISA.03&apos;];
+obj.ISAdata4=msg[i][&apos;ISA&apos;][&apos;ISA.04&apos;];
+obj.ISAdata5=msg[i][&apos;ISA&apos;][&apos;ISA.05&apos;];
+obj.ISAdata6=msg[i][&apos;ISA&apos;][&apos;ISA.06&apos;];
+obj.GSdata=msg[i][&apos;GS&apos;];
+obj.GSdata1=msg[i][&apos;GS&apos;][&apos;GS.01&apos;];
+obj.GSdata2=msg[i][&apos;GS&apos;][&apos;GS.02&apos;];
+obj.GSdata3=msg[i][&apos;GS&apos;][&apos;GS.03&apos;];
+obj.GSdata4=msg[i][&apos;GS&apos;][&apos;GS.04&apos;];
+obj.GSdata5=msg[i][&apos;GS&apos;][&apos;GS.05&apos;];
+obj.GSdata6=msg[i][&apos;GS&apos;][&apos;GS.06&apos;];
+obj.STdata=msg[i][&apos;ST&apos;];
+obj.STdata1=msg[i][&apos;ST&apos;][&apos;ST.01&apos;];
+obj.STdata2=msg[i][&apos;ST&apos;][&apos;ST.02&apos;];
+obj.STdata3=msg[i][&apos;ST&apos;][&apos;ST.03&apos;];
+objArray.push(obj);
+}
+//Constructing XML from looped JSON
+var newXml = new XML(&quot;&lt;EDI&gt;&lt;/EDI&gt;&quot;);
+newXml[&apos;ISA&apos;];
+newXml[&apos;ISA&apos;][&apos;ISA.01&apos;]=obj.ISAdata1;
+newXml[&apos;ISA&apos;][&apos;ISA.02&apos;]=obj.ISAdata2;
+newXml[&apos;ISA&apos;][&apos;ISA.03&apos;]=obj.ISAdata3;
+newXml[&apos;ISA&apos;][&apos;ISA.04&apos;]=obj.ISAdata4;
+newXml[&apos;ISA&apos;][&apos;ISA.05&apos;]=obj.ISAdata5;
+newXml[&apos;ISA&apos;][&apos;ISA.06&apos;]=obj.ISAdata6;
+newXml[&apos;GS&apos;];
+newXml[&apos;GS&apos;][&apos;GS.01&apos;]=obj.GSdata1;
+newXml[&apos;GS&apos;][&apos;GS.02&apos;]=obj.GSdata2;
+newXml[&apos;GS&apos;][&apos;GS.03&apos;]=obj.GSdata3;
+newXml[&apos;GS&apos;][&apos;GS.04&apos;]=obj.GSdata4;
+newXml[&apos;GS&apos;][&apos;GS.05&apos;]=obj.GSdata5;
+newXml[&apos;GS&apos;][&apos;GS.06&apos;]=obj.GSdata6;
+newXml[&apos;ST&apos;]
+newXml[&apos;ST&apos;][&apos;ST.01&apos;]=obj.STdata1;
+newXml[&apos;ST&apos;][&apos;ST.02&apos;]=obj.STdata2;
+newXml[&apos;ST&apos;][&apos;ST.03&apos;]=obj.STdata3;
+logger.info(&quot;XML : &quot;+newXml);
+//Convert XML to EDI/X12 837 message
+var q = SerializerFactory.getSerializer(&apos;EDI/X12&apos;).fromXML(newXml);
+channelMap.put(&apos;serialize&apos;,q);//provide global channelMap access
+//log Output
+logger.info(&quot;EDI message : &quot;+q);</string>
+            </entry>
+          </data>
+        </step>
+      </steps>
+      <inboundTemplate encoding="base64">W3sKCiJJU0EiOnsKIklTQS4wMSI6IjAwIiwKIklTQS4wMiI6IiIsCiJJU0EuMDMiOiIwMCIsCiJJ
+U0EuMDQiOiIiLAoiSVNBLjA1IjoienoiLAoiSVNBLjA2IjoiOTk5OTk5OTk5OSIKfSwKCiJHUyI6
+ewoiR1MuMDEiOiJIQyIsCiJHUy4wMiI6Ijk5OTk5OTk5OTkiLAoiR1MuMDMiOiI4ODg4ODg4ODg4
+IiwKIkdTLjA0IjoiMjAxMTEyMTkiLAoiR1MuMDUiOiIxMzQwIiwKIkdTLjA2IjoiMTM3NyIKfSwK
+CiJTVCI6ewoiU1QuMDEiOiI4MzciLAoiU1QuMDIiOiIwMDAxIiwKIlNULjAzIjoiMDA1MDEwWDIy
+MiIKfQoKfV0K</inboundTemplate>
+      <outboundTemplate encoding="base64"></outboundTemplate>
+      <inboundDataType>JSON</inboundDataType>
+      <outboundDataType>RAW</outboundDataType>
+      <inboundProperties class="com.mirth.connect.plugins.datatypes.json.JSONDataTypeProperties" version="3.3.1">
+        <batchProperties class="com.mirth.connect.plugins.datatypes.json.JSONBatchProperties" version="3.3.1">
+          <batchScript></batchScript>
+        </batchProperties>
+      </inboundProperties>
+      <outboundProperties class="com.mirth.connect.plugins.datatypes.raw.RawDataTypeProperties" version="3.3.1">
+        <batchProperties class="com.mirth.connect.plugins.datatypes.raw.RawBatchProperties" version="3.3.1">
+          <splitType>JavaScript</splitType>
+          <batchScript></batchScript>
+        </batchProperties>
+      </outboundProperties>
+    </transformer>
+    <filter version="3.3.1">
+      <rules/>
+    </filter>
+    <transportName>File Reader</transportName>
+    <mode>SOURCE</mode>
+    <enabled>true</enabled>
+    <waitForPrevious>true</waitForPrevious>
+  </sourceConnector>
+  <destinationConnectors>
+    <connector version="3.3.1">
+      <metaDataId>1</metaDataId>
+      <name>Destination 1</name>
+      <properties class="com.mirth.connect.connectors.file.FileDispatcherProperties" version="3.3.1">
+        <pluginProperties/>
+        <destinationConnectorProperties version="3.3.1">
+          <queueEnabled>false</queueEnabled>
+          <sendFirst>false</sendFirst>
+          <retryIntervalMillis>10000</retryIntervalMillis>
+          <regenerateTemplate>false</regenerateTemplate>
+          <retryCount>0</retryCount>
+          <rotate>false</rotate>
+          <includeFilterTransformer>false</includeFilterTransformer>
+          <threadCount>1</threadCount>
+          <threadAssignmentVariable></threadAssignmentVariable>
+          <validateResponse>false</validateResponse>
+          <resourceIds class="singleton-set">
+            <string>Default Resource</string>
+          </resourceIds>
+        </destinationConnectorProperties>
+        <scheme>FILE</scheme>
+        <host>D:/EDIX12</host>
+        <outputPattern>output.txt</outputPattern>
+        <anonymous>true</anonymous>
+        <username>anonymous</username>
+        <password>anonymous</password>
+        <timeout>10000</timeout>
+        <secure>true</secure>
+        <passive>true</passive>
+        <validateConnection>true</validateConnection>
+        <outputAppend>true</outputAppend>
+        <errorOnExists>false</errorOnExists>
+        <temporary>false</temporary>
+        <binary>false</binary>
+        <charsetEncoding>DEFAULT_ENCODING</charsetEncoding>
+        <template>${serialize}</template>
+      </properties>
+      <transformer version="3.3.1">
+        <steps/>
+        <inboundDataType>RAW</inboundDataType>
+        <outboundDataType>RAW</outboundDataType>
+        <inboundProperties class="com.mirth.connect.plugins.datatypes.raw.RawDataTypeProperties" version="3.3.1">
+          <batchProperties class="com.mirth.connect.plugins.datatypes.raw.RawBatchProperties" version="3.3.1">
+            <splitType>JavaScript</splitType>
+            <batchScript></batchScript>
+          </batchProperties>
+        </inboundProperties>
+        <outboundProperties class="com.mirth.connect.plugins.datatypes.raw.RawDataTypeProperties" version="3.3.1">
+          <batchProperties class="com.mirth.connect.plugins.datatypes.raw.RawBatchProperties" version="3.3.1">
+            <splitType>JavaScript</splitType>
+            <batchScript></batchScript>
+          </batchProperties>
+        </outboundProperties>
+      </transformer>
+      <responseTransformer version="3.3.1">
+        <steps/>
+        <inboundDataType>RAW</inboundDataType>
+        <outboundDataType>RAW</outboundDataType>
+        <inboundProperties class="com.mirth.connect.plugins.datatypes.raw.RawDataTypeProperties" version="3.3.1">
+          <batchProperties class="com.mirth.connect.plugins.datatypes.raw.RawBatchProperties" version="3.3.1">
+            <splitType>JavaScript</splitType>
+            <batchScript></batchScript>
+          </batchProperties>
+        </inboundProperties>
+        <outboundProperties class="com.mirth.connect.plugins.datatypes.raw.RawDataTypeProperties" version="3.3.1">
+          <batchProperties class="com.mirth.connect.plugins.datatypes.raw.RawBatchProperties" version="3.3.1">
+            <splitType>JavaScript</splitType>
+            <batchScript></batchScript>
+          </batchProperties>
+        </outboundProperties>
+      </responseTransformer>
+      <filter version="3.3.1">
+        <rules/>
+      </filter>
+      <transportName>File Writer</transportName>
+      <mode>DESTINATION</mode>
+      <enabled>true</enabled>
+      <waitForPrevious>true</waitForPrevious>
+    </connector>
+  </destinationConnectors>
+  <preprocessingScript>// Modify the message variable below to pre process data
+return message;</preprocessingScript>
+  <postprocessingScript>// This script executes once after a message has been processed
+// Responses returned from here will be stored as &quot;Postprocessor&quot; in the response map
+return;</postprocessingScript>
+  <deployScript>// This script executes once when the channel is deployed
+// You only have access to the globalMap and globalChannelMap here to persist data
+// This script executes once when the channel is deployed
+// You only have access to the globalMap and globalChannelMap here to persist data
+</deployScript>
+  <undeployScript>// This script executes once when the channel is undeployed
+// You only have access to the globalMap and globalChannelMap here to persist data
+return;</undeployScript>
+  <properties version="3.3.1">
+    <clearGlobalChannelMap>true</clearGlobalChannelMap>
+    <messageStorageMode>DEVELOPMENT</messageStorageMode>
+    <encryptData>false</encryptData>
+    <removeContentOnCompletion>false</removeContentOnCompletion>
+    <removeOnlyFilteredOnCompletion>false</removeOnlyFilteredOnCompletion>
+    <removeAttachmentsOnCompletion>false</removeAttachmentsOnCompletion>
+    <initialState>STARTED</initialState>
+    <storeAttachments>true</storeAttachments>
+    <tags class="linked-hash-set"/>
+    <metaDataColumns>
+      <metaDataColumn>
+        <name>SOURCE</name>
+        <type>STRING</type>
+        <mappingName>mirth_source</mappingName>
+      </metaDataColumn>
+      <metaDataColumn>
+        <name>TYPE</name>
+        <type>STRING</type>
+        <mappingName>mirth_type</mappingName>
+      </metaDataColumn>
+    </metaDataColumns>
+    <attachmentProperties>
+      <className>com.mirth.connect.server.attachments.JavaScriptAttachmentHandler</className>
+      <type>JavaScript</type>
+      <properties>
+        <entry>
+          <string>javascript.script</string>
+          <string>// Modify the message variable below to create attachments
+return message;</string>
+        </entry>
+      </properties>
+    </attachmentProperties>
+    <archiveEnabled>true</archiveEnabled>
+    <resourceIds class="linked-hash-set">
+      <string>Default Resource</string>
+    </resourceIds>
+  </properties>
+  <codeTemplateLibraries>
+    <codeTemplateLibrary version="3.3.1">
+      <id>dbdf9cc6-fa5a-4b25-8f94-f03bdf1a32c5</id>
+      <name>Library 1</name>
+      <revision>2</revision>
+      <lastModified>
+        <time>1445262112581</time>
+        <timezone>Asia/Calcutta</timezone>
+      </lastModified>
+      <description>This library was added upon migration to version 3.3.0. It includes all pre-existing
+code templates, and is set to be included on all pre-existing and new channels.
+
+You should create your own new libraries and assign code templates to them as you
+see fit. You should also link libraries to specific channels, so that you&apos;re not
+necessarily including all code templates on all channels all the time.</description>
+      <includeNewChannels>true</includeNewChannels>
+      <enabledChannelIds>
+        <string>7581d4ad-2720-4a2c-9ba0-aac06fb30e9f</string>
+      </enabledChannelIds>
+      <disabledChannelIds/>
+      <codeTemplates/>
+    </codeTemplateLibrary>
+  </codeTemplateLibraries>
+</channel>
