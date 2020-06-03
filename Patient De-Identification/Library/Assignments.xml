@@ -1,0 +1,101 @@
+<codeTemplateLibrary version="3.8.1">
+  <id>42927d6f-99d7-42ba-82fd-6544a4563d56</id>
+  <name>Assignments</name>
+  <revision>2</revision>
+  <lastModified>
+    <time>1591180104670</time>
+    <timezone>Asia/Calcutta</timezone>
+  </lastModified>
+  <description></description>
+  <includeNewChannels>false</includeNewChannels>
+  <enabledChannelIds>
+    <string>2f8acfdf-eb85-451b-86c2-592dd5ae8926</string>
+  </enabledChannelIds>
+  <disabledChannelIds>
+    <string>35e5e533-f147-4051-b06f-3e568d772760</string>
+    <string>5c3db2e8-12ee-4fff-b475-71133c120905</string>
+    <string>e1cbbc08-ddd2-424f-bf62-0053442d9972</string>
+    <string>8ee4170a-7604-45ac-a652-545074dd5dc6</string>
+    <string>be6bf827-0553-4f7d-9ee4-7eb53dcb0174</string>
+    <string>b3241fdf-55ff-4684-92f5-d47034bdc529</string>
+    <string>2c955d19-db6c-455a-811b-c7e5213a2c38</string>
+    <string>f8ecd236-e878-4be9-8bb7-4618dfb9eb20</string>
+    <string>d910ecd2-8647-42f7-9f91-de0b5fb1fc91</string>
+    <string>09dd7643-cbdb-48ac-ad39-4319ecdfd890</string>
+    <string>44a203e4-57aa-437e-98e1-d5895cf41ca3</string>
+    <string>5d6f177e-3420-478f-8b57-01dc40662dd7</string>
+    <string>6a28fc79-93bf-4ffe-8908-3c0eec40c9fd</string>
+    <string>9117bf64-cdc1-4df4-8eac-a6f6a9957708</string>
+    <string>5258dc01-bad1-4b4a-b522-a3d1e8d445d8</string>
+    <string>bd6a3fc9-fad7-4271-bd12-30a5af39c5e3</string>
+    <string>a4665de7-40a3-4acc-926e-37ef995f5ed8</string>
+    <string>59e4e6e3-b6d4-42db-acd0-a1959b8e6309</string>
+  </disabledChannelIds>
+  <codeTemplates>
+    <codeTemplate version="3.8.1">
+      <id>b059bd22-ada1-4dea-9e4d-3ddfe7d9c581</id>
+      <name>patient_deidentification</name>
+      <revision>4</revision>
+      <lastModified>
+        <time>1591181765999</time>
+        <timezone>Asia/Calcutta</timezone>
+      </lastModified>
+      <contextSet>
+        <delegate>
+          <contextType>SOURCE_FILTER_TRANSFORMER</contextType>
+          <contextType>SOURCE_RECEIVER</contextType>
+          <contextType>DESTINATION_FILTER_TRANSFORMER</contextType>
+          <contextType>DESTINATION_DISPATCHER</contextType>
+          <contextType>DESTINATION_RESPONSE_TRANSFORMER</contextType>
+        </delegate>
+      </contextSet>
+      <properties class="com.mirth.connect.model.codetemplates.BasicCodeTemplateProperties">
+        <type>FUNCTION</type>
+        <code>     function  createFakerPid(lastName, firstName, streetAddress, city, state, zip, mobNumber)
+     {
+      	msg[&apos;PID&apos;][&apos;PID.5&apos;][&apos;PID.5.1&apos;] = lastName;
+     	msg[&apos;PID&apos;][&apos;PID.5&apos;][&apos;PID.5.2&apos;] = lastName;
+     	msg[&apos;PID&apos;][&apos;PID.5&apos;][&apos;PID.5.3&apos;] = firstName;
+    	     msg[&apos;PID&apos;][&apos;PID.11&apos;][&apos;PID.11.1&apos;] = streetAddress;
+    	     msg[&apos;PID&apos;][&apos;PID.11&apos;][&apos;PID.11.3&apos;] = city;
+    	     msg[&apos;PID&apos;][&apos;PID.11&apos;][&apos;PID.11.4&apos;] = state;
+    	     msg[&apos;PID&apos;][&apos;PID.11&apos;][&apos;PID.11.5&apos;] = zip;
+          msg[&apos;PID&apos;][&apos;PID.13&apos;][&apos;PID.13.1&apos;] = mobNumber;
+     }
+
+     function createFakerGt1(lastName, firstName, streetAddress, city, state, zip, mobNumber)
+     {
+      	msg[&apos;GT1&apos;][&apos;GT1.3&apos;][&apos;GT1.3.1&apos;] = lastName;
+     	msg[&apos;GT1&apos;][&apos;GT1.3&apos;][&apos;GT1.3.2&apos;] = firstName;
+     	msg[&apos;GT1&apos;][&apos;GT1.4&apos;][&apos;GT1.4.1&apos;] = lastName;
+     	msg[&apos;GT1&apos;][&apos;GT1.4&apos;][&apos;GT1.4.2&apos;] = firstName;
+    	     msg[&apos;GT1&apos;][&apos;GT1.5&apos;][&apos;GT1.5.1&apos;] = streetAddress;
+    	     msg[&apos;GT1&apos;][&apos;GT1.5&apos;][&apos;GT1.5.3&apos;] = city;
+    	     msg[&apos;GT1&apos;][&apos;GT1.5&apos;][&apos;GT1.5.4&apos;] = state;
+    	     msg[&apos;GT1&apos;][&apos;GT1.5&apos;][&apos;GT1.5.5&apos;] = zip;
+          msg[&apos;GT1&apos;][&apos;GT1.6&apos;][&apos;GT1.6.1&apos;] = mobNumber;
+     }
+
+     function  createFakerNk1(lastName, firstName, streetAddress, city, state, zip, mobNumber)
+     {
+      	msg[&apos;NK1&apos;][&apos;NK1.2&apos;][&apos;NK1.2.1&apos;] = lastName;
+     	msg[&apos;NK1&apos;][&apos;NK1.2&apos;][&apos;NK1.2.2&apos;] = firstName;
+    	     msg[&apos;NK1&apos;][&apos;NK1.4&apos;][&apos;NK1.4.1&apos;] = streetAddress;
+    	     msg[&apos;NK1&apos;][&apos;NK1.4&apos;][&apos;NK1.4.3&apos;] = city;
+    	     msg[&apos;NK1&apos;][&apos;NK1.4&apos;][&apos;NK1.4.4&apos;] = state;
+    	     msg[&apos;NK1&apos;][&apos;NK1.4&apos;][&apos;NK1.4.5&apos;] = zip;
+     }
+
+     function  createFakerIN1(name, streetAddress, city, state, zip, mobNumber)
+     {
+      	msg[&apos;IN1&apos;][&apos;IN1.4&apos;][&apos;IN1.4.1&apos;] = name;
+    	     msg[&apos;IN1&apos;][&apos;IN1.5&apos;][&apos;IN1.5.1&apos;] = streetAddress;
+    	     msg[&apos;IN1&apos;][&apos;IN1.5&apos;][&apos;IN1.5.3&apos;] = city;
+    	     msg[&apos;IN1&apos;][&apos;IN1.5&apos;][&apos;IN1.5.4&apos;] = state;
+    	     msg[&apos;IN1&apos;][&apos;IN1.5&apos;][&apos;IN1.5.5&apos;] = zip;
+    	     msg[&apos;IN1&apos;][&apos;IN1.7&apos;][&apos;IN1.7.1&apos;] = mobNumber;
+     }</code>
+      </properties>
+    </codeTemplate>
+  </codeTemplates>
+</codeTemplateLibrary>
